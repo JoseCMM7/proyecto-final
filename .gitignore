@@ -1,0 +1,15 @@
+# Entorno virtual
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Variables de entorno (aquí irán tus contraseñas de Postgres)
+.env
+
+# Archivos de VS Code
+.vscode/
+
+# Logs y bases de datos locales
+*.log
+*.sqlite
