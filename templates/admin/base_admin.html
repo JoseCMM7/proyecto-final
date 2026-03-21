@@ -36,9 +36,9 @@
                 <a href="{{ url_for('admin.doctores') }}" class="menu-item {% if request.endpoint == 'admin.doctores' %}active{% endif %}">
                     <i class="fas fa-user-md"></i> Doctores
                 </a>
-                
-                <a href="#" class="menu-item">
-                    <i class="fas fa-box"></i> Gestión de recursos
+
+                <a href="{{ url_for('admin.recursos') }}" class="menu-item {% if request.endpoint == 'admin.recursos' %}active{% endif %}">
+                    <i class="fas fa-box"></i> Gestion de recursos
                 </a>
             </div>
 

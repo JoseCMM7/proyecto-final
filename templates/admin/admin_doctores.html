@@ -2,6 +2,10 @@
 
 {% block title %}Doctores{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
+{% endblock %}
+
 {% block content %}
     <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">Doctores</h2>
 
@@ -13,6 +17,15 @@
         
         <div class="filters-container">
             <div class="select-group">
+                <label>FILTRAR POR:</label>
+                <select id="filtroDoctores">
+                    <option value="todos">Todos los doctores</option>
+                    <option value="activos">Activos</option>
+                    <option value="inactivos">Inactivos</option>
+                </select>
+            </div>
+
+            <div class="select-group">
                 <label>ORDENAR POR:</label>
                 <select id="ordenarDoctores">
                     <option value="nombre">Nombre</option>
@@ -21,20 +34,22 @@
                 </select>
             </div>
 
-            <button class="btn-primary">
+            <a href="#modalAltaDoctor" class="btn-primary" style="text-decoration: none;">
                 <i class="fas fa-plus"></i> Dar de alta doctor
-            </button>
+            </a>
         </div>
     </div>
 
-    <div class="items-simple-grid">
+    <div class="patients-simple-grid" style="margin-top: 32px;">
         {% for d in doctores %}
-        <div class="card-simple">
-            <div class="card-simple-info">
+        <div class="patient-card-simple">
+            <div class="patient-card-info">
                 <h3>{{ d.nombre }}</h3>
                 <p><i class="far fa-calendar-alt"></i> Contratación: {{ d.fecha_ingreso }}</p>
             </div>
-            </div>
+        </div>
+        {% else %}
+        <p style="color: var(--admin-text-gray);">No hay doctores registrados en el sistema aún.</p>
         {% endfor %}
     </div>
 {% endblock %}

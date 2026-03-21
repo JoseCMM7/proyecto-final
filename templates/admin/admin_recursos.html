@@ -1,0 +1,53 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Recursos{% endblock %}
+
+{% block content %}
+    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">Gestion de Recursos</h2>
+
+    <div class="action-toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar dispositivos..." id="buscadorDispositivos">
+        </div>
+        
+        <div class="filters-container">
+            <div class="select-group">
+                <label>FILTRAR POR:</label>
+                <select id="filtroTipoDispositivo">
+                    <option value="todos">Todos los tipos</option>
+                    <option value="gps">Solo GPS</option>
+                    <option value="beacon">Solo Beacons</option>
+                    <option value="nfc">Solo NFCs</option>
+                </select>
+            </div>
+
+            <div class="select-group">
+                <label>ORDENAR POR:</label>
+                <select id="ordenarDispositivos">
+                    <option value="nombre">Nombre</option>
+                    <option value="fecha_reciente">Registro mas reciente</option>
+                    <option value="fecha_antigua">Registro mas antiguo</option>
+                </select>
+            </div>
+
+            <button class="btn-primary">
+                <i class="fas fa-plus"></i> Dar de alta dispositivo
+            </button>
+        </div>
+    </div>
+
+    <div class="items-simple-grid">
+        {% for disp in dispositivos %}
+        <div class="card-resource" data-tipo="{{ disp.tipo }}">
+            <div class="device-icon-wrapper">
+                <i class="{{ disp.icono }}"></i>
+            </div>
+            <div class="card-simple-info" style="width: 100%;">
+                <h3 style="margin-bottom: 12px;">{{ disp.nombre }}</h3>
+                <p><i class="far fa-calendar-alt"></i> Registro: {{ disp.fecha_registro }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

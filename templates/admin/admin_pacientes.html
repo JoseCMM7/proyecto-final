@@ -1,9 +1,8 @@
 {% extends 'admin/base_admin.html' %}
-
 {% block title %}Pacientes{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -35,20 +34,150 @@
                 </select>
             </div>
 
-            <button class="btn-primary">
+            <a href="#modalAltaPaciente" class="btn-primary" style="text-decoration: none;">
                 <i class="fas fa-plus"></i> Dar de alta paciente
-            </button>
+            </a>
         </div>
     </div>
 
-    <div class="patients-simple-grid" id="contenedorPacientes">
+    <div class="modal-overlay" id="modalAltaPaciente">
+        <div class="modal-content">
+            <a href="#" class="modal-close" style="text-decoration: none;"><i class="fas fa-times"></i></a>
+            
+            <div class="modal-header">
+                <h2>Dar de alta paciente</h2>
+                <p>Complete el expediente clinico y asigne dispositivos IOT para el seguimiento remoto.</p>
+            </div>
+
+            <form action="{{ url_for('admin.alta_paciente') }}" method="POST">
+                <div class="form-grid">
+                    
+                    <div class="col-left">
+                        <div class="form-section-title">Informacion Personal</div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Primer Nombre</label><input type="text" name="nombre" class="form-control" placeholder="Ej. Juan" required></div>
+                            <div class="form-group"><label>Primer Apellido</label><input type="text" name="apellido" class="form-control" placeholder="Ej. Perez" required></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" class="form-control" required></div>
+                            <div class="form-group"><label>Telefono</label><input type="text" name="telefono" class="form-control" placeholder="+34 000 000 000"></div>
+                        </div>
+                        <div class="form-group"><label>Email de contacto</label><input type="email" name="email" class="form-control" placeholder="juan@ejemplo.com"></div>
+
+                        <div class="form-section-title" style="margin-top: 32px;">Cuenta del Paciente</div>
+                        <div class="box-section form-row">
+                            <div class="form-group" style="margin-bottom: 0;"><label>Username</label><input type="text" name="username" class="form-control" placeholder="usuario123" required></div>
+                            <div class="form-group" style="margin-bottom: 0;"><label>Password</label><input type="password" name="password" class="form-control" placeholder="••••••••" required></div>
+                        </div>
+
+                        <div class="form-section-title" style="margin-top: 32px;">Doctores Asignados</div>
+                        <div class="form-group">
+                            <label>Seleccionar Medicos (Usa Ctrl/Cmd para elegir varios)</label>
+                            <select name="doctores_asignados" class="form-control" multiple style="height: 100px;">
+                                {% for doc in doctores %}
+                                    <option value="{{ doc.id }}">Dr. {{ doc.nombre }} {{ doc.apellido }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-section-title" style="margin-top: 32px;">Dispositivos IOT</div>
+                        <div class="box-section">
+                            <div class="form-group">
+                                <label>Asignar GPS</label>
+                                <select name="id_gps" class="form-control">
+                                    <option value="">-- Sin asignar --</option>
+                                    {% for g in gps_libres %}
+                                    <option value="{{ g.id }}">{{ g.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Asignar Beacon</label>
+                                    <select name="id_beacon" class="form-control">
+                                        <option value="">-- Sin asignar --</option>
+                                        {% for b in beacons_libres %}
+                                        <option value="{{ b.id }}">{{ b.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Asignar NFC</label>
+                                    <select name="id_nfc" class="form-control">
+                                        <option value="">-- Sin asignar --</option>
+                                        {% for n in nfcs_libres %}
+                                        <option value="{{ n.id }}">{{ n.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-right">
+                        <div class="form-section-title">Informacion Clinica</div>
+                        <div class="form-group">
+                            <label>Enfermedad / Patologia Principal</label>
+                            <select name="id_enfermedad" class="form-control" required>
+                                <option value="">Seleccione una patologia</option>
+                                {% for enf in enfermedades %}
+                                    <option value="{{ enf.id }}">{{ enf.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Grado</label>
+                                <input type="text" name="grado_enfermedad" class="form-control" placeholder="Ej. 2">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Diagnostico</label>
+                                <input type="date" name="fecha_diagnostico" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group"><label>Actividad fisica minima recomendada (Pasos/Dia)</label><input type="number" name="actividad_minima" class="form-control" value="0"></div>
+
+                        <div class="form-section-title" style="margin-top: 32px;">Familiar Responsable</div>
+                        <div class="box-section">
+                            <div class="form-row">
+                                <div class="form-group"><label>Nombre</label><input type="text" name="nombre_fam" class="form-control" placeholder="Ej. Ana"></div>
+                                <div class="form-group"><label>Apellido</label><input type="text" name="apellido_fam" class="form-control" placeholder="Ej. Garcia"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Email</label><input type="email" name="email_fam" class="form-control" placeholder="ana@ejemplo.com"></div>
+                                <div class="form-group"><label>Telefono</label><input type="text" name="telefono_fam" class="form-control" placeholder="+34 600 000 000"></div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Relacion</label>
+                                <select name="relacion_fam" class="form-control">
+                                    <option value="Hijo/a">Hijo/a</option>
+                                    <option value="Esposo/a">Esposo/a</option>
+                                    <option value="Padre/Madre">Padre/Madre</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a href="#" class="btn-secondary">Descartar cambios</a>
+                    <button type="submit" class="btn-primary">Finalizar Alta de Paciente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="patients-simple-grid" style="margin-top: 32px;">
         {% for p in pacientes %}
         <div class="patient-card-simple">
             <div class="patient-card-info">
                 <h3>{{ p.nombre }}</h3>
                 <p><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso }}</p>
             </div>
-            <div class="dot-{{ p.estado }}"></div>
+            <div class="status-dot dot-{{ p.estado }}"></div>
         </div>
         {% endfor %}
     </div>
