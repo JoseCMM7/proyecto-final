@@ -1,0 +1,364 @@
+/* Variables de color para el dashboard */
+:root {
+    --admin-bg: #f8fafc;
+    --admin-sidebar-bg: #ffffff;
+    --admin-primary: #1455d3;
+    --admin-primary-dark: #0f42a1;
+    --admin-text-dark: #1e293b;
+    --admin-text-gray: #64748b;
+    --admin-border: #e2e8f0;
+    --alert-red: #b91c1c;
+    --alert-red-bg: #fee2e2;
+    --state-yellow: #ca8a04;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+* {
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text-dark);
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- BARRA LATERAL (SIDEBAR) --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--admin-sidebar-bg);
+    border-right: 1px solid var(--admin-border);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    position: fixed;
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding: 0 24px;
+    margin-bottom: 48px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--admin-primary);
+}
+
+.logo-container i {
+    font-size: 24px;
+}
+
+.logo-container h1 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.sidebar-header p {
+    font-size: 11px;
+    color: var(--admin-text-gray);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.sidebar-menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 24px;
+    color: var(--admin-text-gray);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.menu-item i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.menu-item:hover {
+    color: var(--admin-primary);
+    background-color: #f1f5f9;
+}
+
+.menu-item.active {
+    color: var(--admin-primary);
+    background-color: #f1f5f9;
+    border-left-color: var(--admin-primary);
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    padding: 0 24px;
+    margin-top: auto;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--admin-text-gray);
+    font-size: 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--admin-border);
+}
+
+/* --- CONTENIDO PRINCIPAL --- */
+.main-content {
+    margin-left: 260px; /* Respeta el ancho de tu sidebar */
+    flex: 1;
+    padding: 48px;
+    /* Centra el contenedor interno */
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; /* Evita que se estire verticalmente */
+}
+
+/* --- OPTIMIZACIÓN DEL CONTENEDOR CENTRAL --- */
+.content-wrapper {
+    width: 100%;
+    max-width: 1100px; /* Limita el ancho para que no se desparrame en monitores gigantes */
+    display: flex;
+    flex-direction: column;
+    gap: 48px; /* Separación perfecta entre tarjetas y listas */
+}
+
+/* --- TARJETAS DE ESTADÍSTICAS --- */
+.stats-cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.stats-card {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--admin-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--admin-text-gray);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--admin-primary);
+    margin-bottom: 16px;
+}
+
+.card-subtext {
+    font-size: 12px;
+    color: var(--admin-text-gray);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-subtext i {
+    font-size: 10px;
+}
+
+.alert-badge {
+    background-color: var(--alert-red);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    align-self: flex-start; /* Para que el badge no ocupe todo el ancho */
+}
+
+/* --- CONTENEDOR DE LISTAS APILADAS --- */
+.lists-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Espacio entre la sección roja y amarilla */
+}
+
+.section-header {
+    margin-bottom: 24px;
+}
+
+.section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--admin-text-dark);
+}
+
+.section-header p {
+    font-size: 14px;
+    color: var(--admin-text-gray);
+    margin-top: 4px;
+}
+
+/* --- GRID DE PACIENTES --- */
+.patient-cards-grid {
+    display: grid;
+    /* Esto hace que las tarjetas de pacientes llenen el espacio horizontalmente en varias columnas */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.patient-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--admin-border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.state-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+}
+
+.patient-card.red-alert .state-bar {
+    background-color: var(--alert-red);
+}
+
+.patient-card.yellow-state .state-bar {
+    background-color: var(--state-yellow);
+}
+
+.patient-info {
+    flex: 1;
+}
+
+.patient-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--admin-text-dark);
+}
+
+.patient-info p {
+    font-size: 13px;
+    color: var(--admin-text-gray);
+    margin-top: 2px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.patient-card.red-alert .status-dot {
+    background-color: var(--alert-red);
+}
+
+.patient-card.yellow-state .status-dot {
+    background-color: var(--state-yellow);
+}
+
+/* --- RESPONSIVIDAD PARA CUALQUIER TAMANO DE PANTALLA --- */
+
+/* Para tablets (pantallas medianas menores a 1024px) */
+@media (max-width: 1024px) {
+    .stats-cards-container {
+        /* Pasa de 3 a 2 columnas para no apretar los numeros */
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Para celulares (pantallas menores a 768px) */
+@media (max-width: 768px) {
+    body {
+        /* En lugar de estar de lado a lado, apilamos todo verticalmente */
+        flex-direction: column;
+    }
+
+    .sidebar {
+        /* La barra lateral deja de ser fija y se vuelve un menu superior */
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--admin-border);
+        padding: 20px;
+    }
+
+    .sidebar-header {
+        margin-bottom: 20px;
+    }
+
+    .sidebar-menu {
+        /* Ponemos los botones uno al lado del otro */
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .menu-item {
+        padding: 8px 16px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+    }
+
+    .menu-item.active {
+        border-left: none;
+        border-bottom-color: var(--admin-primary);
+    }
+
+    .sidebar-footer {
+        margin-top: 16px;
+        padding-top: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .main-content {
+        /* Quitamos el espacio vacio de la izquierda y reducimos el borde exterior */
+        margin-left: 0;
+        padding: 24px 16px;
+    }
+
+    .stats-cards-container {
+        /* Tarjetas de estadisticas en 1 sola columna para que no se aplasten */
+        grid-template-columns: 1fr;
+    }
+
+    .patient-cards-grid {
+        /* Las tarjetas de los pacientes toman todo el ancho del celular */
+        grid-template-columns: 1fr;
+    }
+}

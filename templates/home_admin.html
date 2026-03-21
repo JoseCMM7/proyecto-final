@@ -1,11 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home admiistrador</title>
+    <title>HealthNode - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/admin_home.css">
 </head>
 <body>
-    <h1>Bievenido a la pagina home del admin</h1>
+    <div class="dashboard-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i class="fas fa-shield-heart"></i>
+                    <h1>HealthNode</h1>
+                </div>
+                <p>ADMIN DASHBOARD</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="{{ url_for('admin.home') }}" class="menu-item active"><i class="fas fa-home"></i> Home</a>
+                <a href="#" class="menu-item"><i class="fas fa-user-injured"></i> Pacientes</a>
+                <a href="#" class="menu-item"><i class="fas fa-user-md"></i> Doctores</a>
+                <a href="#" class="menu-item"><i class="fas fa-box"></i> Gestión de recursos</a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="admin-profile" style="font-weight: 700; color: var(--admin-primary); font-size: 16px;">
+                    {{ admin_nombre }}
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="menu-item logout-link" style="padding-left: 0; margin-top: 8px;">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="content-wrapper">
+                <section class="stats-cards-container">
+                    <div class="stats-card">
+                        <p class="card-title">TOTAL DE PACIENTES</p>
+                        <p class="card-value">{{ total_pacientes }}</p>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <p class="card-title">DISPOSITIVOS ACTIVOS</p>
+                        <p class="card-value">{{ total_dispositivos }}</p>
+                        <p class="card-subtext"><i class="fas fa-broadcast-tower"></i> MONITOREO EN TIEMPO REAL</p>
+                    </div>
+
+                    <div class="stats-card">
+                        <p class="card-title">PACIENTES EN ESTADO ROJO</p>
+                        <p class="card-value">{{ pacientes_rojos_count }}</p>
+                        <span class="alert-badge">ATENCIÓN INMEDIATA</span>
+                    </div>
+                </section>
+
+                <div class="lists-container">
+                    <section class="patient-list-section red-alerts-section">
+                        <div class="section-header">
+                            <h2>Pacientes en alerta roja</h2>
+                        </div>
+                        <div class="patient-cards-grid">
+                            {% for paciente in pacientes_rojos %}
+                            <div class="patient-card red-alert">
+                                <div class="state-bar"></div>
+                                <div class="patient-info">
+                                    <h3>{{ paciente.nombre }} {{ paciente.apellido }}</h3>
+                                    <p>ID: #{{ paciente.id }}</p>
+                                </div>
+                                <div class="status-dot"></div>
+                            </div>
+                            {% else %}
+                            <p class="card-subtext" style="padding: 20px;">No hay pacientes críticos.</p>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="patient-list-section yellow-states-section">
+                        <div class="section-header">
+                            <h2>Pacientes en estado amarillo</h2>
+                        </div>
+                        <div class="patient-cards-grid">
+                            {% for paciente in pacientes_amarillos %}
+                            <div class="patient-card yellow-state">
+                                <div class="state-bar"></div>
+                                <div class="patient-info">
+                                    <h3>{{ paciente.nombre }} {{ paciente.apellido }}</h3>
+                                    <p>ID: #{{ paciente.id }}</p>
+                                </div>
+                                <div class="status-dot"></div>
+                            </div>
+                            {% else %}
+                            <p class="card-subtext" style="padding: 20px;">No hay pacientes en amarillo.</p>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
