@@ -23,12 +23,22 @@
         </div>
 
         <div class="login-card">
-            <form action="#" method="POST">
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="alert-error">
+                  {% for message in messages %}
+                    <p>{{ message }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <form action="/" method="POST">
                 <div class="form-group">
                     <label for="username">USUARIO</label>
                     <div class="input-container">
                         <i class="far fa-user"></i>
-                        <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                        <input type="text" id="username" name="username" placeholder="Ingrese su usuario" required>
                     </div>
                 </div>
 
@@ -36,7 +46,7 @@
                     <label for="password">CLAVE</label>
                     <div class="input-container">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="password" placeholder="••••••••" required>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
                     </div>
                 </div>
 

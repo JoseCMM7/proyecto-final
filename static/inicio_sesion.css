@@ -179,3 +179,16 @@ body {
     letter-spacing: 0.8px;
     font-weight: 600;
 }
+
+/* Alertas de error */
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    text-align: center;
+    border: 1px solid #f87171;
+    font-weight: 500;
+}
