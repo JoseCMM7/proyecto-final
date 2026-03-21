@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthNode - Acceso</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/static/inicio_sesion.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-header">
+            <div class="logo-icon">
+                <i class="fas fa-shield-heart"></i>
+            </div>
+            <h1>HealthNode</h1>
+            <p>Acceso al sistema</p>
+        </div>
+
+        <div class="login-card">
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="username">USUARIO</label>
+                    <div class="input-container">
+                        <i class="far fa-user"></i>
+                        <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">CLAVE</label>
+                    <div class="input-container">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Iniciar Sesion <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <p class="secure-badge">
+                <i class="fas fa-shield-alt"></i> Conexion cifrada de grado clinico
+            </p>
+            <p class="copyright">
+                © 2024 HEALTHNODE SYSTEMS. TODOS LOS DERECHOS RESERVADOS.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
