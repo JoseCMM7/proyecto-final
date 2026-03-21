@@ -1,0 +1,40 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Doctores{% endblock %}
+
+{% block content %}
+    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">Doctores</h2>
+
+    <div class="action-toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar doctores..." id="buscadorDoctores">
+        </div>
+        
+        <div class="filters-container">
+            <div class="select-group">
+                <label>ORDENAR POR:</label>
+                <select id="ordenarDoctores">
+                    <option value="nombre">Nombre</option>
+                    <option value="fecha_reciente">Ingreso más reciente</option>
+                    <option value="fecha_antigua">Ingreso más antiguo</option>
+                </select>
+            </div>
+
+            <button class="btn-primary">
+                <i class="fas fa-plus"></i> Dar de alta doctor
+            </button>
+        </div>
+    </div>
+
+    <div class="items-simple-grid">
+        {% for d in doctores %}
+        <div class="card-simple">
+            <div class="card-simple-info">
+                <h3>{{ d.nombre }}</h3>
+                <p><i class="far fa-calendar-alt"></i> Contratación: {{ d.fecha_ingreso }}</p>
+            </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

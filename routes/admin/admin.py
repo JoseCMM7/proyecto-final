@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 from models import (
     db, Usuario, Paciente, Administrador, HistorialEstado, 
-    DispositivoGPS, DispositivoBeacon, DispositivoNFC
+    DispositivoGPS, DispositivoBeacon, DispositivoNFC, Doctor
 )
 
 # Definimos el blueprint para el administrador
@@ -80,3 +80,25 @@ def pacientes():
     return render_template('admin/admin_pacientes.html', 
                            admin_nombre=admin_nombre, 
                            pacientes=pacientes_lista)
+
+@admin_bp.route('/doctores')
+def doctores():
+    if session.get('rol') != 'admin':
+        return redirect(url_for('auth.login'))
+
+    admin = Administrador.query.filter_by(id_usuario=session['user_id']).first()
+    
+    # CONSULTA REAL: Obtenemos todos los doctores de la base de datos
+    doctores_db = Doctor.query.all()
+    lista_doctores = []
+
+    for d in doctores_db:
+        lista_doctores.append({
+            'nombre': f"{d.nombre} {d.apellido}",
+            # Formateamos la fecha de contratación
+            'fecha_ingreso': d.fecha_contratacion.strftime('%d/%m/%Y')
+        })
+
+    return render_template('admin/admin_doctores.html', 
+                           admin_nombre=admin.nombre if admin else "Admin", 
+                           doctores=lista_doctores)

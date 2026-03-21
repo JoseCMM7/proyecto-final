@@ -25,18 +25,20 @@
                 <p>ADMIN PORTAL</p>
             </div>
 
-            <div class="sidebar-menu">
+                        <div class="sidebar-menu">
                 <a href="{{ url_for('admin.home') }}" class="menu-item {% if request.endpoint == 'admin.home' %}active{% endif %}">
                     <i class="fas fa-home"></i> Home
                 </a>
                 <a href="{{ url_for('admin.pacientes') }}" class="menu-item {% if request.endpoint == 'admin.pacientes' %}active{% endif %}">
                     <i class="fas fa-user-injured"></i> Pacientes
                 </a>
-                <a href="#" class="menu-item">
+                
+                <a href="{{ url_for('admin.doctores') }}" class="menu-item {% if request.endpoint == 'admin.doctores' %}active{% endif %}">
                     <i class="fas fa-user-md"></i> Doctores
                 </a>
+                
                 <a href="#" class="menu-item">
-                    <i class="fas fa-box"></i> Gestion de recursos
+                    <i class="fas fa-box"></i> Gestión de recursos
                 </a>
             </div>
 
