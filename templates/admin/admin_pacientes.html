@@ -1,0 +1,55 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Pacientes{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">Pacientes</h2>
+
+    <div class="action-toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar pacientes..." id="buscadorPacientes">
+        </div>
+        
+        <div class="filters-container">
+            <div class="select-group">
+                <label>FILTRAR POR:</label>
+                <select id="filtroEstado">
+                    <option value="todos">Todos los estados</option>
+                    <option value="rojo">Estado Rojo</option>
+                    <option value="amarillo">Estado Amarillo</option>
+                    <option value="verde">Estado Verde</option>
+                </select>
+            </div>
+
+            <div class="select-group">
+                <label>ORDENAR POR:</label>
+                <select id="ordenarPacientes">
+                    <option value="nombre">Nombre</option>
+                    <option value="fecha_reciente">Ingreso mas reciente</option>
+                    <option value="fecha_antigua">Ingreso mas antiguo</option>
+                </select>
+            </div>
+
+            <button class="btn-primary">
+                <i class="fas fa-plus"></i> Dar de alta paciente
+            </button>
+        </div>
+    </div>
+
+    <div class="patients-simple-grid" id="contenedorPacientes">
+        {% for p in pacientes %}
+        <div class="patient-card-simple">
+            <div class="patient-card-info">
+                <h3>{{ p.nombre }}</h3>
+                <p><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso }}</p>
+            </div>
+            <div class="dot-{{ p.estado }}"></div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin_home.css') }}">
+{% endblock %}
+
+{% block content %}
+    <section class="stats-cards-container">
+        <div class="stats-card">
+            <p class="card-title">TOTAL DE PACIENTES</p>
+            <p class="card-value">{{ total_pacientes }}</p>
+        </div>
+        
+        <div class="stats-card">
+            <p class="card-title">DISPOSITIVOS ACTIVOS</p>
+            <p class="card-value">{{ total_dispositivos }}</p>
+            <p class="card-subtext">
+                <i class="fas fa-broadcast-tower"></i> MONITOREO EN TIEMPO REAL
+            </p>
+        </div>
+
+        <div class="stats-card">
+            <p class="card-title">PACIENTES EN ESTADO ROJO</p>
+            <p class="card-value">{{ pacientes_rojos_count }}</p>
+            <span class="alert-badge">ATENCION INMEDIATA</span>
+        </div>
+    </section>
+
+    <div class="lists-container">
+        <section class="patient-list-section red-alerts-section">
+            <div class="section-header">
+                <h2>Pacientes en alerta roja</h2>
+            </div>
+
+            <div class="patient-cards-grid">
+                {% for paciente in pacientes_rojos %}
+                <div class="patient-card red-alert">
+                    <div class="state-bar"></div>
+                    <div class="patient-info">
+                        <h3>{{ paciente.nombre }} {{ paciente.apellido }}</h3>
+                        <p>ID: #{{ paciente.id }}</p>
+                    </div>
+                    <div class="status-dot"></div>
+                </div>
+                {% else %}
+                <p class="card-subtext" style="padding: 20px;">
+                    No hay pacientes en estado critico actualmente.
+                </p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="patient-list-section yellow-states-section">
+            <div class="section-header">
+                <h2>Pacientes en estado amarillo</h2>
+                <p>Requiere monitoreo continuo</p>
+            </div>
+
+            <div class="patient-cards-grid">
+                {% for paciente in pacientes_amarillos %}
+                <div class="patient-card yellow-state">
+                    <div class="state-bar"></div>
+                    <div class="patient-info">
+                        <h3>{{ paciente.nombre }} {{ paciente.apellido }}</h3>
+                        <p>ID: #{{ paciente.id }}</p>
+                    </div>
+                    <div class="status-dot"></div>
+                </div>
+                {% else %}
+                <p class="card-subtext" style="padding: 20px;">
+                    No hay pacientes en estado amarillo actualmente.
+                </p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -15,7 +15,9 @@ def login():
             session['rol'] = user.rol
             
             # Redirección según el rol [cite: 63, 64, 65]
-            if user.rol == 'admin': return redirect(url_for('admin.home'))
+            # Ejemplo de redirección dentro del login:
+            if user.rol == 'admin':
+                return redirect(url_for('admin.home')) # 'admin' es el nombre del blueprint, 'home' la función
             if user.rol == 'doctor': return redirect(url_for('doctor.home'))
             if user.rol == 'paciente': return redirect(url_for('paciente.home'))
         

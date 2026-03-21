@@ -1,0 +1,124 @@
+/* --- TARJETAS DE ESTADISTICAS --- */
+.stats-cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.stats-card {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--admin-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--admin-text-gray);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--admin-primary);
+    margin-bottom: 16px;
+}
+
+.card-subtext {
+    font-size: 12px;
+    color: var(--admin-text-gray);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.alert-badge {
+    background-color: var(--alert-red);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    align-self: flex-start;
+}
+
+/* --- CONTENEDOR DE LISTAS APILADAS --- */
+.lists-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.section-header {
+    margin-bottom: 24px;
+}
+
+.section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--admin-text-dark);
+}
+
+.section-header p {
+    font-size: 14px;
+    color: var(--admin-text-gray);
+    margin-top: 4px;
+}
+
+/* --- GRID DE PACIENTES (HOME) --- */
+.patient-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.patient-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--admin-border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.state-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+}
+
+.patient-card.red-alert .state-bar { background-color: var(--alert-red); }
+.patient-card.yellow-state .state-bar { background-color: var(--state-yellow); }
+
+.patient-info { flex: 1; }
+.patient-info h3 { font-size: 16px; font-weight: 600; color: var(--admin-text-dark); }
+.patient-info p { font-size: 13px; color: var(--admin-text-gray); margin-top: 2px; }
+
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.patient-card.red-alert .status-dot { background-color: var(--alert-red); }
+.patient-card.yellow-state .status-dot { background-color: var(--state-yellow); }
+
+/* --- RESPONSIVIDAD DASHBOARD --- */
+@media (max-width: 1024px) {
+    .stats-cards-container { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+    .stats-cards-container { grid-template-columns: 1fr; }
+    .patient-cards-grid { grid-template-columns: 1fr; }
+}
