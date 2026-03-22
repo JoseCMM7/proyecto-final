@@ -93,6 +93,7 @@
     gap: 24px;
 }
 
+/* Busca esta clase y agrégale la transición y el cursor */
 .patient-card-simple {
     background: #ffffff;
     padding: 24px;
@@ -102,6 +103,16 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    /* NUEVO: Transición suave y cursor pointer */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+}
+
+/* NUEVO: Efecto de elevación al pasar el ratón (Hover) */
+.patient-card-simple:hover {
+    transform: translateY(-5px); /* Levanta la tarjeta 5 pixeles */
+    box-shadow: 0 12px 20px -8px rgba(20, 85, 211, 0.3); /* Sombra con el tono azul de tu marca */
+    border-color: #bfdbfe; /* Un borde azul muy suave */
 }
 
 .patient-card-info h3 {

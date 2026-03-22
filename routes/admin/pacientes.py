@@ -4,7 +4,7 @@ from models import (
     db, Usuario, Paciente, Administrador, HistorialEstado, 
     DispositivoGPS, DispositivoBeacon, DispositivoNFC, 
     Doctor, Enfermedad, SubtipoEnfermedad, Familiar, PacienteFamiliar,
-    AsignacionGPS, AsignacionBeacon, AsignacionNFC, PacienteEnfermedad
+    AsignacionGPS, AsignacionBeacon, AsignacionNFC, PacienteEnfermedad, ControlMedico, PacienteTratamiento, Tratamiento
 )
 from . import admin_bp
 
@@ -18,11 +18,13 @@ def pacientes():
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     admin = Administrador.query.filter_by(id_usuario=session['user_id']).first()
     
+    # Dentro de def pacientes():
     pacientes_db = Paciente.query.all()
     lista = []
     for p in pacientes_db:
         est = HistorialEstado.query.filter_by(id_paciente=p.id, fecha_fin=None).first()
         lista.append({
+            'id': p.id, # <-- NUEVO: Agregamos el ID del paciente aquí
             'nombre': f"{p.nombre} {p.apellido}",
             'fecha_ingreso': p.fecha_ingreso.strftime('%d/%m/%Y'),
             'estado': est.estado.lower() if est else 'verde',
@@ -101,3 +103,75 @@ def alta_paciente():
         flash(f'Error al guardar: {str(e)}', 'error')
 
     return redirect(url_for('admin.pacientes'))
+
+@admin_bp.route('/paciente/<int:id>')
+def perfil_paciente(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    # 1. Datos principales del paciente y su estado
+    paciente = Paciente.query.get_or_404(id)
+    estado_obj = HistorialEstado.query.filter_by(id_paciente=id, fecha_fin=None).first()
+    estado_actual = estado_obj.estado if estado_obj else 'INDEFINIDO'
+    
+    # 2. Resumen Clinico (Enfermedad y Subtipo)
+    paciente_enf = PacienteEnfermedad.query.filter_by(id_paciente=id).first()
+    enfermedad_nombre = "No registrada"
+    subtipo_desc = "N/A"
+    if paciente_enf:
+        enf = Enfermedad.query.get(paciente_enf.id_enfermedad)
+        sub = SubtipoEnfermedad.query.get(paciente_enf.id_subtipo) if paciente_enf.id_subtipo else None
+        enfermedad_nombre = enf.nombre if enf else "No registrada"
+        subtipo_desc = sub.descripcion if sub else "N/A"
+
+    # 3. Doctores asignados
+    doctores = paciente.doctores
+
+    # 4. Familiares
+    relaciones_fam = PacienteFamiliar.query.filter_by(id_paciente=id).all()
+    familiares = []
+    for rel in relaciones_fam:
+        fam = Familiar.query.get(rel.id_familiar)
+        if fam:
+            familiares.append({'datos': fam, 'relacion': rel.relacion})
+
+    # 5. Dispositivos (Beacons y GPS activos)
+    beacons_asignados = AsignacionBeacon.query.filter_by(id_paciente=id, fecha_retiro=None).all()
+    gps_asignados = AsignacionGPS.query.filter_by(id_paciente=id, fecha_retiro=None).all()
+    
+    lista_beacons = [DispositivoBeacon.query.get(b.id_beacon) for b in beacons_asignados]
+    lista_gps = [DispositivoGPS.query.get(g.id_gps) for g in gps_asignados]
+
+    # 6. Controles Medicos
+    controles = ControlMedico.query.filter_by(id_paciente=id).order_by(ControlMedico.fecha_control.desc()).all()
+
+    # 7. Tratamientos
+    tratamientos_db = PacienteTratamiento.query.filter_by(id_paciente=id).all()
+    lista_tratamientos = []
+    
+    for t in tratamientos_db:
+        trat_info = Tratamiento.query.get(t.id_tratamiento)
+        doc_info = Doctor.query.get(t.id_doctor)
+        
+        lista_tratamientos.append({
+            'dosis_valor': t.dosis_valor,
+            'dosis_unidad': t.dosis_unidad,
+            'frecuencia_valor': t.frecuencia_valor,
+            'frecuencia_unidad': t.frecuencia_unidad,
+            'fecha_inicio': t.fecha_inicio,
+            'fecha_fin': t.fecha_fin,
+            'nombre': trat_info.nombre if trat_info else 'Desconocido',
+            'tipo': trat_info.tipo if trat_info else 'Medicamento',
+            'descripcion': trat_info.descripcion if trat_info else 'Sin descripcion',
+            'doctor_nombre': f"Dr. {doc_info.nombre} {doc_info.apellido}" if doc_info else 'No registrado'
+        })
+
+    return render_template('admin/perfil_paciente.html', 
+                           paciente=paciente, 
+                           estado=estado_actual,
+                           enfermedad=enfermedad_nombre,
+                           subtipo=subtipo_desc,
+                           doctores=doctores,
+                           familiares=familiares,
+                           beacons=lista_beacons,
+                           gps=lista_gps,
+                           tratamientos=lista_tratamientos) # <-- Pasamos la nueva lista

@@ -174,17 +174,19 @@
 
     <div class="patients-simple-grid" id="gridPacientes" style="margin-top: 32px;">
         {% for p in pacientes %}
-        <div class="patient-card-simple paciente-card"
-             data-nombre="{{ p.nombre | lower }}"
-             data-estado="{{ p.estado }}"
-             data-fecha="{{ p.fecha_raw }}">
+        <a href="{{ url_for('admin.perfil_paciente', id=p.id) }}" 
+           class="patient-card-simple paciente-card"
+           data-nombre="{{ p.nombre | lower }}"
+           data-estado="{{ p.estado }}"
+           data-fecha="{{ p.fecha_raw }}"
+           style="text-decoration: none; display: flex;">
              
             <div class="patient-card-info">
-                <h3>{{ p.nombre }}</h3>
-                <p><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso }}</p>
+                <h3 style="color: var(--admin-text-dark);">{{ p.nombre }}</h3>
+                <p style="color: var(--admin-text-gray);"><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso }}</p>
             </div>
             <div class="status-dot dot-{{ p.estado }}"></div>
-        </div>
+        </a>
         {% else %}
         <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No hay pacientes registrados en el sistema aun.</p>
         {% endfor %}
