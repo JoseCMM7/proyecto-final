@@ -25,7 +25,8 @@ def pacientes():
         lista.append({
             'nombre': f"{p.nombre} {p.apellido}",
             'fecha_ingreso': p.fecha_ingreso.strftime('%d/%m/%Y'),
-            'estado': est.estado.lower() if est else 'verde'
+            'estado': est.estado.lower() if est else 'verde',
+            'fecha_raw': p.fecha_ingreso.strftime('%Y-%m-%d') if p.fecha_ingreso else "1970-01-01"
         })
 
     doctores_disponibles = Doctor.query.all()
@@ -40,7 +41,14 @@ def pacientes():
     nfcs_asignados = [a.id_nfc for a in AsignacionNFC.query.filter(AsignacionNFC.fecha_retiro.is_(None)).all()]
     nfcs_libres = DispositivoNFC.query.filter(~DispositivoNFC.id.in_(nfcs_asignados)).all() if nfcs_asignados else DispositivoNFC.query.all()
 
-    return render_template('admin/admin_pacientes.html', admin_nombre=admin.nombre if admin else "Admin", pacientes=lista, doctores=doctores_disponibles, enfermedades=enfermedades_disponibles, gps_libres=gps_libres, beacons_libres=beacons_libres, nfcs_libres=nfcs_libres)
+    return render_template('admin/admin_pacientes.html', 
+                           admin_nombre=admin.nombre if admin else "Admin", 
+                           pacientes=lista,
+                           doctores=doctores_disponibles,
+                           enfermedades=enfermedades_disponibles,
+                           gps_libres=gps_libres,
+                           beacons_libres=beacons_libres,
+                           nfcs_libres=nfcs_libres)
 
 @admin_bp.route('/pacientes/alta', methods=['POST'])
 def alta_paciente():

@@ -29,8 +29,8 @@
                 <label>ORDENAR POR:</label>
                 <select id="ordenarDoctores">
                     <option value="nombre">Nombre</option>
-                    <option value="fecha_reciente">Ingreso mas reciente</option>
-                    <option value="fecha_antigua">Ingreso mas antiguo</option>
+                    <option value="fecha_reciente">Ingreso más reciente</option>
+                    <option value="fecha_antigua">Ingreso más antiguo</option>
                 </select>
             </div>
 
@@ -46,41 +46,25 @@
             
             <div class="modal-header">
                 <h2>Dar de alta doctor</h2>
-                <p>Complete el expediente clinico del nuevo ingreso para el seguimiento remoto.</p>
+                <p>Complete el expediente clínico del nuevo ingreso para el seguimiento remoto.</p>
             </div>
 
             <form action="{{ url_for('admin.alta_doctor') }}" method="POST">
                 <div class="form-grid">
-                    
                     <div class="col-left">
-                        <div class="form-section-title">Informacion Personal</div>
+                        <div class="form-section-title">Información Personal</div>
                         
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Primer Nombre</label>
-                                <input type="text" name="nombre" class="form-control" placeholder="Ej. Juan" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Primer Apellido</label>
-                                <input type="text" name="apellido" class="form-control" placeholder="Ej. Perez" required>
-                            </div>
+                            <div class="form-group"><label>Primer Nombre</label><input type="text" name="nombre" class="form-control" placeholder="Ej. Juan" required></div>
+                            <div class="form-group"><label>Primer Apellido</label><input type="text" name="apellido" class="form-control" placeholder="Ej. Pérez" required></div>
                         </div>
 
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Telefono</label>
-                                <input type="text" name="telefono" class="form-control" placeholder="+34 000 000 000">
-                            </div>
-                            <div class="form-group">
-                                <label>Cedula Profesional</label>
-                                <input type="text" name="cedula" class="form-control" placeholder="1234567" required>
-                            </div>
+                            <div class="form-group"><label>Teléfono</label><input type="text" name="telefono" class="form-control" placeholder="+34 000 000 000"></div>
+                            <div class="form-group"><label>Cédula Profesional</label><input type="text" name="cedula" class="form-control" placeholder="1234567" required></div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Email de contacto</label>
-                            <input type="email" name="email" class="form-control" placeholder="juan.perez@ejemplo.com">
-                        </div>
+                        <div class="form-group"><label>Email de contacto</label><input type="email" name="email" class="form-control" placeholder="juan.perez@ejemplo.com"></div>
 
                         <div class="form-group">
                             <label>Especialidad</label>
@@ -97,14 +81,8 @@
                         <div class="form-section-title">Cuenta del Doctor</div>
                         <div class="box-section">
                             <div class="form-row">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label>Username</label>
-                                    <input type="text" name="username" class="form-control" placeholder="usuario123" required>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label>Password</label>
-                                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-                                </div>
+                                <div class="form-group" style="margin-bottom: 0;"><label>Username</label><input type="text" name="username" class="form-control" placeholder="usuario123" required></div>
+                                <div class="form-group" style="margin-bottom: 0;"><label>Password</label><input type="password" name="password" class="form-control" placeholder="••••••••" required></div>
                             </div>
                         </div>
                     </div>
@@ -118,19 +96,78 @@
         </div>
     </div>
 
-    <div class="patients-simple-grid" style="margin-top: 32px;">
+    <div class="patients-simple-grid" id="gridDoctores" style="margin-top: 32px;">
         {% for d in doctores %}
-        <div class="patient-card-simple">
+        <div class="patient-card-simple doctor-card"
+             data-nombre="{{ d.nombre | lower }}"
+             data-fecha="{{ d.fecha_raw }}"
+             data-estado="{{ d.estado }}">
+             
             <div class="patient-card-info">
                 <h3>{{ d.nombre }}</h3>
                 <p style="color: var(--admin-primary); font-weight: 600; font-size: 12px; margin-bottom: 8px;">
                     {{ d.especialidad }}
                 </p>
-                <p><i class="far fa-calendar-alt"></i> Contratacion: {{ d.fecha_ingreso }}</p>
+                <p><i class="far fa-calendar-alt"></i> Contratación: {{ d.fecha_ingreso }}</p>
+                
+                {% if d.estado == 'inactivos' %}
+                <p style="color: #ef4444; font-size: 11px; margin-top: 4px; font-weight: bold;">(Inactivo)</p>
+                {% endif %}
             </div>
         </div>
         {% else %}
-        <p style="color: var(--admin-text-gray);">No hay doctores registrados en el sistema aun.</p>
+        <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No hay doctores registrados en el sistema aún.</p>
         {% endfor %}
     </div>
+
+    <script>
+        const buscador = document.getElementById('buscadorDoctores');
+        const filtroEstado = document.getElementById('filtroDoctores');
+        const ordenSelect = document.getElementById('ordenarDoctores');
+        const grid = document.getElementById('gridDoctores');
+
+        function actualizarTableroDoctores() {
+            const textoBusqueda = buscador.value.toLowerCase();
+            const estadoSeleccionado = filtroEstado.value;
+            const modoOrden = ordenSelect.value;
+            
+            let tarjetas = Array.from(grid.getElementsByClassName('doctor-card'));
+
+            // 1. Filtrar y Buscar
+            tarjetas.forEach(tarjeta => {
+                const nombre = tarjeta.getAttribute('data-nombre');
+                const estado = tarjeta.getAttribute('data-estado');
+                
+                const cumpleBusqueda = nombre.includes(textoBusqueda);
+                const cumpleFiltro = (estadoSeleccionado === 'todos' || estado === estadoSeleccionado);
+
+                if (cumpleBusqueda && cumpleFiltro) {
+                    tarjeta.style.display = ''; 
+                } else {
+                    tarjeta.style.display = 'none'; 
+                }
+            });
+
+            // 2. Ordenar las visibles
+            let tarjetasVisibles = tarjetas.filter(t => t.style.display !== 'none');
+
+            tarjetasVisibles.sort((a, b) => {
+                if (modoOrden === 'nombre') {
+                    return a.getAttribute('data-nombre').localeCompare(b.getAttribute('data-nombre'));
+                } else if (modoOrden === 'fecha_reciente') {
+                    return new Date(b.getAttribute('data-fecha')) - new Date(a.getAttribute('data-fecha'));
+                } else if (modoOrden === 'fecha_antigua') {
+                    return new Date(a.getAttribute('data-fecha')) - new Date(b.getAttribute('data-fecha'));
+                }
+            });
+
+            // 3. Reorganizar en la pantalla
+            tarjetasVisibles.forEach(tarjeta => grid.appendChild(tarjeta));
+        }
+
+        // Escuchar los eventos
+        buscador.addEventListener('input', actualizarTableroDoctores);
+        filtroEstado.addEventListener('change', actualizarTableroDoctores);
+        ordenSelect.addEventListener('change', actualizarTableroDoctores);
+    </script>
 {% endblock %}

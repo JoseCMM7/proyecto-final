@@ -12,14 +12,17 @@ def doctores():
     lista_doctores = []
 
     for d in doctores_db:
+        # Determinamos si está activo o inactivo basado en si tiene fecha de baja
+        estado = 'inactivos' if d.fecha_baja_doctor else 'activos'
+
         lista_doctores.append({
             'nombre': f"Dr. {d.nombre} {d.apellido}",
-            # Ahora accedemos al nombre de la especialidad a través de la relación
             'especialidad': d.especialidad_rel.nombre if d.especialidad_rel else "Sin especialidad",
-            'fecha_ingreso': d.fecha_contratacion.strftime('%d/%m/%Y') if d.fecha_contratacion else "Sin registro"
+            'fecha_ingreso': d.fecha_contratacion.strftime('%d/%m/%Y') if d.fecha_contratacion else "Sin registro",
+            'fecha_raw': d.fecha_contratacion.strftime('%Y-%m-%d') if d.fecha_contratacion else "1970-01-01",
+            'estado': estado
         })
 
-    # Consultamos las especialidades para llenar el <select> del formulario
     especialidades_disponibles = Especialidad.query.all()
 
     return render_template('admin/admin_doctores.html', 
@@ -45,7 +48,6 @@ def alta_doctor():
         nuevo_doctor = Doctor(
             nombre=request.form.get('nombre'),
             apellido=request.form.get('apellido'),
-            # Recibimos el ID desde el formulario
             id_especialidad=request.form.get('id_especialidad'),
             telefono=request.form.get('telefono'),
             email=request.form.get('email'),
