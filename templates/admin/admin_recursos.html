@@ -1,53 +1,197 @@
 {% extends 'admin/base_admin.html' %}
+{% block title %}Gestion de Recursos{% endblock %}
 
-{% block title %}Recursos{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
+{% endblock %}
 
 {% block content %}
-    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">Gestion de Recursos</h2>
+<h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">Gestion de Recursos</h2>
 
-    <div class="action-toolbar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Buscar dispositivos..." id="buscadorDispositivos">
+<div class="action-toolbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Buscar dispositivos..." id="buscadorDispositivos">
+    </div>
+
+    <div class="filters-container">
+        <div class="select-group">
+            <label>FILTRAR POR:</label>
+            <select id="filtroTipo">
+                <option value="todos">Todos los dispositivos</option>
+                <option value="gps">Solo GPS</option>
+                <option value="beacon">Solo Beacons</option>
+                <option value="nfc">Solo NFC</option>
+            </select>
         </div>
+
+        <div class="select-group">
+            <label>ORDENAR POR:</label>
+            <select id="ordenarDispositivos">
+                <option value="nombre_asc">Nombre (A - Z)</option>
+                <option value="nombre_desc">Nombre (Z - A)</option>
+                <option value="fecha_reciente">Registro más reciente</option>
+                <option value="fecha_antigua">Registro más antiguo</option>
+            </select>
+        </div>
+
+        <a href="#modalAltaDispositivo" class="btn-primary" style="text-decoration: none;">
+            <i class="fas fa-plus"></i> Registrar dispositivo
+        </a>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalAltaDispositivo">
+    <div class="modal-content" style="max-width: 600px;">
+        <a href="#" class="modal-close" style="text-decoration: none;"><i class="fas fa-times"></i></a>
+
+        <div class="modal-header">
+            <h2>Registrar Dispositivo IOT</h2>
+            <p>Agregue un nuevo sensor al inventario para poder asignarlo a un paciente.</p>
+        </div>
+
+        <form action="{{ url_for('admin.alta_recurso') }}" method="POST">
+            <div class="form-section-title">Informacion General</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo de Dispositivo</label>
+                    <select name="tipo_dispositivo" id="tipoDispositivoSelect" class="form-control" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="beacon">Beacon Bluetooth</option>
+                        <option value="gps">Rastreador GPS</option>
+                        <option value="nfc">Etiqueta NFC</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nombre identificador</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej. beacon_cuarto_2" required>
+                </div>
+            </div>
+
+            <div id="camposBeacon" style="display: none; margin-top: 24px;">
+                <div class="form-section-title">Configuracion Beacon</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>TX Power</label>
+                        <input type="text" name="tx_power" class="form-control" placeholder="Ej. -12dBm">
+                    </div>
+                    <div class="form-group">
+                        <label>Intervalo de llamadas (Adv)</label>
+                        <input type="text" name="intervalo_adv" class="form-control" placeholder="Ej. 100 ms">
+                    </div>
+                </div>
+            </div>
+
+            <div id="camposGPS" style="display: none; margin-top: 24px;">
+                <div class="form-section-title">Configuracion GPS</div>
+                <div class="form-group">
+                    <label>Frecuencia de actualizacion</label>
+                    <input type="text" name="freq_gps" class="form-control" placeholder="Ej. 10 min">
+                </div>
+            </div>
+
+            <div id="camposNFC" style="display: none; margin-top: 24px;">
+                <div class="form-section-title">Configuracion NFC</div>
+                <div class="form-group">
+                    <label>Codigo Serial / UID (Unico)</label>
+                    <input type="text" name="codigo_nfc" class="form-control" placeholder="Ej. 04:9A:8B:22:11">
+                </div>
+            </div>
+
+            <div class="modal-footer" style="margin-top: 32px;">
+                <a href="#" class="btn-secondary">Descartar</a>
+                <button type="submit" class="btn-primary">Guardar Dispositivo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="patients-simple-grid" id="gridDispositivos" style="margin-top: 32px;">
+    {% for disp in dispositivos %}
+    <div class="patient-card-simple device-card" 
+         data-tipo="{{ disp.tipo }}" 
+         data-nombre="{{ disp.nombre | lower }}" 
+         data-fecha="{{ disp.fecha_raw }}">
         
-        <div class="filters-container">
-            <div class="select-group">
-                <label>FILTRAR POR:</label>
-                <select id="filtroTipoDispositivo">
-                    <option value="todos">Todos los tipos</option>
-                    <option value="gps">Solo GPS</option>
-                    <option value="beacon">Solo Beacons</option>
-                    <option value="nfc">Solo NFCs</option>
-                </select>
-            </div>
-
-            <div class="select-group">
-                <label>ORDENAR POR:</label>
-                <select id="ordenarDispositivos">
-                    <option value="nombre">Nombre</option>
-                    <option value="fecha_reciente">Registro mas reciente</option>
-                    <option value="fecha_antigua">Registro mas antiguo</option>
-                </select>
-            </div>
-
-            <button class="btn-primary">
-                <i class="fas fa-plus"></i> Dar de alta dispositivo
-            </button>
+        <div class="patient-card-info">
+            <h3>
+                <i class="{{ disp.icono }}" style="margin-right: 8px; color: var(--admin-primary);"></i> 
+                {{ disp.nombre }}
+            </h3>
+            <p style="text-transform: uppercase; font-size: 11px; font-weight: 700; color: var(--admin-text-gray); margin-top: 4px;">
+                {{ disp.tipo }}
+            </p>
+            <p style="margin-top: 8px;"><i class="far fa-calendar-alt"></i> Registro: {{ disp.fecha_registro }}</p>
         </div>
     </div>
+    {% else %}
+    <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No hay dispositivos registrados en el inventario aun.</p>
+    {% endfor %}
+</div>
 
-    <div class="items-simple-grid">
-        {% for disp in dispositivos %}
-        <div class="card-resource" data-tipo="{{ disp.tipo }}">
-            <div class="device-icon-wrapper">
-                <i class="{{ disp.icono }}"></i>
-            </div>
-            <div class="card-simple-info" style="width: 100%;">
-                <h3 style="margin-bottom: 12px;">{{ disp.nombre }}</h3>
-                <p><i class="far fa-calendar-alt"></i> Registro: {{ disp.fecha_registro }}</p>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+<script>
+    // 1. Mostrar campos en el modal de alta (Lo que ya teníamos)
+    document.getElementById('tipoDispositivoSelect').addEventListener('change', function() {
+        var tipo = this.value;
+        document.getElementById('camposBeacon').style.display = 'none';
+        document.getElementById('camposGPS').style.display = 'none';
+        document.getElementById('camposNFC').style.display = 'none';
+        if (tipo === 'beacon') document.getElementById('camposBeacon').style.display = 'block';
+        else if (tipo === 'gps') document.getElementById('camposGPS').style.display = 'block';
+        else if (tipo === 'nfc') document.getElementById('camposNFC').style.display = 'block';
+    });
+
+    // 2. Lógica para Filtrar, Buscar y Ordenar en tiempo real
+    const buscador = document.getElementById('buscadorDispositivos');
+    const filtroTipo = document.getElementById('filtroTipo');
+    const ordenSelect = document.getElementById('ordenarDispositivos');
+    const grid = document.getElementById('gridDispositivos');
+
+    function actualizarTablero() {
+        const textoBusqueda = buscador.value.toLowerCase();
+        const tipoSeleccionado = filtroTipo.value;
+        const modoOrden = ordenSelect.value;
+        
+        // Convertimos las tarjetas de HTML a un arreglo de JS
+        let tarjetas = Array.from(grid.getElementsByClassName('device-card'));
+
+        // PASO A: Filtrar y Buscar
+        tarjetas.forEach(tarjeta => {
+            const nombre = tarjeta.getAttribute('data-nombre');
+            const tipo = tarjeta.getAttribute('data-tipo');
+            
+            const cumpleBusqueda = nombre.includes(textoBusqueda);
+            const cumpleFiltro = (tipoSeleccionado === 'todos' || tipo === tipoSeleccionado);
+
+            if (cumpleBusqueda && cumpleFiltro) {
+                tarjeta.style.display = ''; // Muestra la tarjeta
+            } else {
+                tarjeta.style.display = 'none'; // Oculta la tarjeta
+            }
+        });
+
+        // PASO B: Ordenar solo las que están visibles
+        let tarjetasVisibles = tarjetas.filter(t => t.style.display !== 'none');
+
+        tarjetasVisibles.sort((a, b) => {
+            if (modoOrden === 'nombre_asc') {
+                return a.getAttribute('data-nombre').localeCompare(b.getAttribute('data-nombre'));
+            } else if (modoOrden === 'nombre_desc') {
+                return b.getAttribute('data-nombre').localeCompare(a.getAttribute('data-nombre'));
+            } else if (modoOrden === 'fecha_reciente') {
+                return new Date(b.getAttribute('data-fecha')) - new Date(a.getAttribute('data-fecha'));
+            } else if (modoOrden === 'fecha_antigua') {
+                return new Date(a.getAttribute('data-fecha')) - new Date(b.getAttribute('data-fecha'));
+            }
+        });
+
+        // PASO C: Volver a meterlas al grid en el nuevo orden
+        tarjetasVisibles.forEach(tarjeta => grid.appendChild(tarjeta));
+    }
+
+    // Escuchamos cuando el usuario escriba o cambie los selectores
+    buscador.addEventListener('input', actualizarTablero);
+    filtroTipo.addEventListener('change', actualizarTablero);
+    ordenSelect.addEventListener('change', actualizarTablero);
+</script>
 {% endblock %}
