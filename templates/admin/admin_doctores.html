@@ -98,23 +98,22 @@
 
     <div class="patients-simple-grid" id="gridDoctores" style="margin-top: 32px;">
         {% for d in doctores %}
-        <div class="patient-card-simple doctor-card"
-             data-nombre="{{ d.nombre | lower }}"
-             data-fecha="{{ d.fecha_raw }}"
-             data-estado="{{ d.estado }}">
+        <a href="{{ url_for('admin.perfil_doctor', id=d.id) }}" 
+           class="patient-card-simple doctor-card clickable-card"
+           data-nombre="{{ d.nombre | lower }}"
+           data-fecha="{{ d.fecha_raw }}"
+           data-estado="{{ d.estado }}">
              
             <div class="patient-card-info">
                 <h3>{{ d.nombre }}</h3>
-                <p style="color: var(--admin-primary); font-weight: 600; font-size: 12px; margin-bottom: 8px;">
-                    {{ d.especialidad }}
-                </p>
+                <p class="especialidad-text">{{ d.especialidad }}</p>
                 <p><i class="far fa-calendar-alt"></i> Contratación: {{ d.fecha_ingreso }}</p>
                 
                 {% if d.estado == 'inactivos' %}
-                <p style="color: #ef4444; font-size: 11px; margin-top: 4px; font-weight: bold;">(Inactivo)</p>
+                <p class="inactivo-text">(Inactivo)</p>
                 {% endif %}
             </div>
-        </div>
+        </a>
         {% else %}
         <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No hay doctores registrados en el sistema aún.</p>
         {% endfor %}

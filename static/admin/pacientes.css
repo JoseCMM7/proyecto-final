@@ -134,3 +134,24 @@
 .dot-rojo { background-color: var(--alert-red); width: 12px; height: 12px; border-radius: 50%; }
 .dot-amarillo { background-color: var(--state-yellow); width: 12px; height: 12px; border-radius: 50%; }
 .dot-verde { background-color: #10b981; width: 12px; height: 12px; border-radius: 50%; } /* Verde esmeralda */
+
+/* --- ANIMACIÓN PARA TARJETAS CLICKEABLES --- */
+.clickable-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+}
+
+.clickable-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px -8px rgba(20, 85, 211, 0.3);
+    border-color: #bfdbfe;
+}
+
+/* Evitar que los enlaces cambien de color por defecto del navegador */
+.clickable-card h3 { color: var(--admin-text-dark); }
+.clickable-card p { color: var(--admin-text-gray); }
+.clickable-card .especialidad-text { color: var(--admin-primary); font-weight: 600; font-size: 12px; margin-bottom: 8px; }
+.clickable-card .inactivo-text { color: #ef4444; font-size: 11px; margin-top: 4px; font-weight: bold; }

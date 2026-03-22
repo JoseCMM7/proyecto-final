@@ -1,0 +1,135 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Perfil Dr. {{ doctor.nombre }} {{ doctor.apellido }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfil_doctor.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('admin.doctores') }}">Doctores</a> / <span>{{ doctor.nombre }} {{ doctor.apellido }}</span>
+</div>
+
+<div class="perfil-header">
+    <div class="titulo-estado">
+        <h1>Dr. {{ doctor.nombre }} {{ doctor.apellido }}</h1>
+    </div>
+    <p class="subtitulo">Perfil del doctor</p>
+    <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+</div>
+
+<div class="top-cards-grid">
+    <div class="card-blanca">
+        <h3 class="seccion-titulo">INFORMACIÓN PERSONAL</h3>
+        <div class="info-grid">
+            <div class="dato-box">
+                <label>Nombre completo</label>
+                <p>{{ doctor.nombre }} {{ doctor.apellido }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Especialidad</label>
+                <p>{{ especialidad }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Cédula profesional</label>
+                <p>{{ doctor.cedula }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Email</label>
+                <p>{{ doctor.email or 'No registrado' }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Fecha de contratación</label>
+                <p>{{ doctor.fecha_contratacion.strftime('%d de %B, %Y') }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Teléfono</label>
+                <p>{{ doctor.telefono or 'No registrado' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-azul">
+        <h3 class="seccion-titulo-azul">RESUMEN CLÍNICO</h3>
+        
+        <div class="dato-box azul-espaciado">
+            <label>Pacientes activos</label>
+            <h2>{{ pacientes_activos }}</h2>
+        </div>
+        
+        <div class="actividad-box">
+            <label>Controles realizados este mes</label>
+            <h2>{{ controles_mes }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header">
+        <h3 class="seccion-titulo">PACIENTES ASIGNADOS</h3>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr>
+                <th>NOMBRE</th>
+                <th>ESTADO</th>
+                <th>ENFERMEDAD PRINCIPAL</th>
+                <th>FECHA DE INGRESO</th>
+                <th>ACCIÓN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pacientes %}
+            <tr>
+                <td><strong>{{ p.nombre }}</strong></td>
+                <td>
+                    <div class="estado-celda">
+                        <div class="status-dot dot-{{ p.estado }}"></div>
+                        <span>Estado {{ p.estado }}</span>
+                    </div>
+                </td>
+                <td>{{ p.enfermedad }}</td>
+                <td>{{ p.fecha_ingreso }}</td>
+                <td><a href="#" class="text-danger">Quitar</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No tiene pacientes asignados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="tabla-footer">
+        <a href="#">VER TODOS LOS PACIENTES</a>
+    </div>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header">
+        <h3 class="seccion-titulo">CONTROLES MÉDICOS REALIZADOS</h3>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr>
+                <th>FECHA DEL CONTROL</th>
+                <th>PACIENTE</th>
+                <th>NOTAS MÉDICAS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in controles %}
+            <tr>
+                <td><strong>{{ c.fecha }}</strong></td>
+                <td>{{ c.paciente_nombre }}</td>
+                <td class="notas-texto">{{ c.notas | truncate(80) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No se han realizado controles médicos aún.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="tabla-footer">
+        <a href="#">VER TODOS LOS CONTROLES</a>
+    </div>
+</div>
+{% endblock %}
