@@ -27,7 +27,6 @@ class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100), nullable=False)
-    especialidad = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(20))
     email = db.Column(db.String(150), unique=True)
     cedula = db.Column(db.String(20), nullable=False, unique=True)
@@ -35,6 +34,10 @@ class Doctor(db.Model):
     fecha_baja_doctor = db.Column(db.Date)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False, unique=True)
     id_admin = db.Column(db.Integer, db.ForeignKey('administradores.id'), nullable=False)
+    
+    # --- ESTAS SON LAS DOS LÍNEAS NUEVAS ---
+    id_especialidad = db.Column(db.Integer, db.ForeignKey('especialidades.id'))
+    especialidad_rel = db.relationship('Especialidad', backref='doctores')
 
 class Paciente(db.Model):
     __tablename__ = 'pacientes'
@@ -214,3 +217,8 @@ class PacienteTratamiento(db.Model):
     id_paciente = db.Column(db.Integer, db.ForeignKey('pacientes.id'), nullable=False)
     id_tratamiento = db.Column(db.Integer, db.ForeignKey('tratamientos.id'), nullable=False)
     id_doctor = db.Column(db.Integer, db.ForeignKey('doctores.id'), nullable=False)
+
+class Especialidad(db.Model):
+    __tablename__ = 'especialidades'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)

@@ -29,8 +29,8 @@
                 <label>ORDENAR POR:</label>
                 <select id="ordenarDoctores">
                     <option value="nombre">Nombre</option>
-                    <option value="fecha_reciente">Ingreso más reciente</option>
-                    <option value="fecha_antigua">Ingreso más antiguo</option>
+                    <option value="fecha_reciente">Ingreso mas reciente</option>
+                    <option value="fecha_antigua">Ingreso mas antiguo</option>
                 </select>
             </div>
 
@@ -40,16 +40,97 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="modalAltaDoctor">
+        <div class="modal-content">
+            <a href="#" class="modal-close" style="text-decoration: none;"><i class="fas fa-times"></i></a>
+            
+            <div class="modal-header">
+                <h2>Dar de alta doctor</h2>
+                <p>Complete el expediente clinico del nuevo ingreso para el seguimiento remoto.</p>
+            </div>
+
+            <form action="{{ url_for('admin.alta_doctor') }}" method="POST">
+                <div class="form-grid">
+                    
+                    <div class="col-left">
+                        <div class="form-section-title">Informacion Personal</div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Primer Nombre</label>
+                                <input type="text" name="nombre" class="form-control" placeholder="Ej. Juan" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Primer Apellido</label>
+                                <input type="text" name="apellido" class="form-control" placeholder="Ej. Perez" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Telefono</label>
+                                <input type="text" name="telefono" class="form-control" placeholder="+34 000 000 000">
+                            </div>
+                            <div class="form-group">
+                                <label>Cedula Profesional</label>
+                                <input type="text" name="cedula" class="form-control" placeholder="1234567" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email de contacto</label>
+                            <input type="email" name="email" class="form-control" placeholder="juan.perez@ejemplo.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Especialidad</label>
+                            <select name="id_especialidad" class="form-control" required>
+                                <option value="">Seleccione una especialidad</option>
+                                {% for esp in especialidades %}
+                                    <option value="{{ esp.id }}">{{ esp.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-right">
+                        <div class="form-section-title">Cuenta del Doctor</div>
+                        <div class="box-section">
+                            <div class="form-row">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Username</label>
+                                    <input type="text" name="username" class="form-control" placeholder="usuario123" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Password</label>
+                                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a href="#" class="btn-secondary">Descartar cambios</a>
+                    <button type="submit" class="btn-primary">Finalizar Alta de doctor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="patients-simple-grid" style="margin-top: 32px;">
         {% for d in doctores %}
         <div class="patient-card-simple">
             <div class="patient-card-info">
                 <h3>{{ d.nombre }}</h3>
-                <p><i class="far fa-calendar-alt"></i> Contratación: {{ d.fecha_ingreso }}</p>
+                <p style="color: var(--admin-primary); font-weight: 600; font-size: 12px; margin-bottom: 8px;">
+                    {{ d.especialidad }}
+                </p>
+                <p><i class="far fa-calendar-alt"></i> Contratacion: {{ d.fecha_ingreso }}</p>
             </div>
         </div>
         {% else %}
-        <p style="color: var(--admin-text-gray);">No hay doctores registrados en el sistema aún.</p>
+        <p style="color: var(--admin-text-gray);">No hay doctores registrados en el sistema aun.</p>
         {% endfor %}
     </div>
 {% endblock %}
