@@ -108,22 +108,23 @@
 
 <div class="patients-simple-grid" id="gridDispositivos" style="margin-top: 32px;">
     {% for disp in dispositivos %}
-    <div class="patient-card-simple device-card" 
-         data-tipo="{{ disp.tipo }}" 
-         data-nombre="{{ disp.nombre | lower }}" 
-         data-fecha="{{ disp.fecha_raw }}">
+    <a href="{{ url_for('admin.perfil_recurso', tipo=disp.tipo, id=disp.id) }}" 
+       class="patient-card-simple device-card clickable-card" 
+       data-tipo="{{ disp.tipo }}" 
+       data-nombre="{{ disp.nombre | lower }}" 
+       data-fecha="{{ disp.fecha_raw }}">
         
         <div class="patient-card-info">
-            <h3>
+            <h3 style="color: var(--admin-text-dark);">
                 <i class="{{ disp.icono }}" style="margin-right: 8px; color: var(--admin-primary);"></i> 
                 {{ disp.nombre }}
             </h3>
-            <p style="text-transform: uppercase; font-size: 11px; font-weight: 700; color: var(--admin-text-gray); margin-top: 4px;">
+            <p style="text-transform: uppercase; font-size: 11px; font-weight: 700; color: var(--admin-primary); margin-top: 4px;">
                 {{ disp.tipo }}
             </p>
             <p style="margin-top: 8px;"><i class="far fa-calendar-alt"></i> Registro: {{ disp.fecha_registro }}</p>
         </div>
-    </div>
+    </a>
     {% else %}
     <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No hay dispositivos registrados en el inventario aun.</p>
     {% endfor %}

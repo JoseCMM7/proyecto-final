@@ -1,0 +1,7 @@
+/* static/admin/perfil_recurso.css */
+
+.estado-celda { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+
+/* Tabla Footer (Ver todos) */
+.tabla-footer { background: #f8fafc; text-align: center; padding: 16px; border-top: 1px solid var(--admin-border); }
+.tabla-footer a { font-size: 11px; font-weight: 700; color: var(--admin-primary); text-transform: uppercase; letter-spacing: 1px; text-decoration: none; }

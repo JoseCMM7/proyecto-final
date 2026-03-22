@@ -1,6 +1,11 @@
-from datetime import date
 from flask import render_template, session, redirect, url_for, request, flash
-from models import db, Administrador, DispositivoGPS, DispositivoBeacon, DispositivoNFC
+from datetime import date
+from models import (
+    db, Administrador, DispositivoGPS, DispositivoBeacon, DispositivoNFC,
+    AsignacionGPS, AsignacionBeacon, AsignacionNFC,
+    RegistroGPS, RegistroBeacon, RegistroNFC,
+    Paciente, HistorialEstado, PacienteEnfermedad, Enfermedad
+)
 from . import admin_bp
 
 @admin_bp.route('/recursos')
@@ -60,3 +65,92 @@ def alta_recurso():
         flash(f'Error al registrar el dispositivo: {str(e)}', 'error')
 
     return redirect(url_for('admin.recursos'))
+
+@admin_bp.route('/recurso/<tipo>/<int:id>')
+def perfil_recurso(tipo, id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+
+    disp_nombre = ""
+    fecha_reg = None
+    fecha_baja = None
+    configs = {}
+    asig_db = []
+    regs_db = []
+    registros_logs = []
+    total_logs = 0
+
+    # 1. Obtener datos según el tipo de dispositivo
+    if tipo == 'beacon':
+        d = DispositivoBeacon.query.get_or_404(id)
+        disp_nombre, fecha_reg, fecha_baja = d.nombre, d.fecha_registro_beacon, d.fecha_baja_beacon
+        configs = {'TX POWER': f"{d.tx_power}", 'INTERVALO DE LLAMADAS': f"{d.intervalo_adv}"}
+        asig_db = AsignacionBeacon.query.filter_by(id_beacon=id).order_by(AsignacionBeacon.fecha_asignacion.desc()).all()
+        regs_db = RegistroBeacon.query.filter_by(id_beacon=id).order_by(RegistroBeacon.fecha_beacon_log.desc()).limit(10).all()
+        total_logs = RegistroBeacon.query.filter_by(id_beacon=id).count()
+        for r in regs_db:
+            registros_logs.append({
+                'fecha': r.fecha_beacon_log.strftime('%d/%m/%Y %H:%M'),
+                'col1': f"{r.distancia_calculada_beacon} m" if r.distancia_calculada_beacon else "N/A",
+                'col2': "Detección de zona"
+            })
+
+    elif tipo == 'gps':
+        d = DispositivoGPS.query.get_or_404(id)
+        disp_nombre, fecha_reg, fecha_baja = d.nombre, d.fecha_registro_gps, d.fecha_baja_gps
+        configs = {'FRECUENCIA ACTUALIZACIÓN': f"{d.freq_gps}"}
+        asig_db = AsignacionGPS.query.filter_by(id_gps=id).order_by(AsignacionGPS.fecha_asignacion.desc()).all()
+        regs_db = RegistroGPS.query.filter_by(id_gps=id).order_by(RegistroGPS.fecha_gps_log.desc()).limit(10).all()
+        total_logs = RegistroGPS.query.filter_by(id_gps=id).count()
+        for r in regs_db:
+            registros_logs.append({
+                'fecha': r.fecha_gps_log.strftime('%d/%m/%Y %H:%M'),
+                'col1': f"Lat: {r.latitud}, Lon: {r.longitud}",
+                'col2': f"Dist: {r.distancia_calculada_gps}m" if r.distancia_calculada_gps else "N/A"
+            })
+
+    elif tipo == 'nfc':
+        d = DispositivoNFC.query.get_or_404(id)
+        disp_nombre, fecha_reg, fecha_baja = d.nombre, d.fecha_registro_nfc, d.fecha_baja_nfc
+        configs = {'CÓDIGO NFC / UID': d.codigo_nfc}
+        asig_db = AsignacionNFC.query.filter_by(id_nfc=id).order_by(AsignacionNFC.fecha_asignacion.desc()).all()
+        regs_db = RegistroNFC.query.filter_by(id_nfc=id).order_by(RegistroNFC.fecha_nfc_log.desc()).limit(10).all()
+        total_logs = RegistroNFC.query.filter_by(id_nfc=id).count()
+        for r in regs_db:
+            registros_logs.append({
+                'fecha': r.fecha_nfc_log.strftime('%d/%m/%Y %H:%M'),
+                'col1': r.motivo_escaneo or "Lectura NFC",
+                'col2': f"Doctor ID: {r.id_doctor}"
+            })
+
+    # 2. Procesar asignaciones a pacientes
+    lista_asignaciones = []
+    paciente_actual = "N/A"
+    
+    for a in asig_db:
+        p = Paciente.query.get(a.id_paciente)
+        if not p: continue
+        
+        # Si no tiene fecha de retiro, es el paciente actual asignado
+        if not a.fecha_retiro: paciente_actual = f"{p.nombre} {p.apellido}"
+
+        est = HistorialEstado.query.filter_by(id_paciente=p.id, fecha_fin=None).first()
+        enf_rel = PacienteEnfermedad.query.filter_by(id_paciente=p.id).first()
+        enf_nombre = Enfermedad.query.get(enf_rel.id_enfermedad).nombre if enf_rel else "Sin registro"
+
+        lista_asignaciones.append({
+            'nombre': f"{p.nombre} {p.apellido}",
+            'estado': est.estado.lower() if est else 'verde',
+            'enfermedad': enf_nombre,
+            'fecha_vinc': a.fecha_asignacion.strftime('%d/%m/%Y'),
+            'activa': True if not a.fecha_retiro else False
+        })
+
+    datos_disp = {
+        'nombre': disp_nombre, 'tipo': tipo,
+        'fecha_reg': fecha_reg.strftime('%d/%m/%Y') if fecha_reg else 'N/A',
+        'fecha_baja': fecha_baja.strftime('%d/%m/%Y') if fecha_baja else 'N/A',
+        'configs': configs, 'paciente_actual': paciente_actual,
+        'total_asignaciones': len(asig_db), 'total_logs': total_logs
+    }
+
+    return render_template('admin/perfil_recurso.html', disp=datos_disp, asignaciones=lista_asignaciones, logs=registros_logs)

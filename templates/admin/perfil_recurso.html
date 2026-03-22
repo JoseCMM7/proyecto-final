@@ -1,0 +1,147 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Dispositivo {{ disp.nombre }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfil_recurso.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('admin.recursos') }}">Gestión de recursos</a> / <span>{{ disp.nombre }}</span>
+</div>
+
+<div class="perfil-header">
+    <div class="titulo-estado">
+        <h1>{{ disp.nombre }}</h1>
+    </div>
+    <p class="subtitulo">Info {{ disp.tipo|upper }}</p>
+    <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+</div>
+
+<div class="top-cards-grid">
+    <div class="card-blanca">
+        <h3 class="seccion-titulo">INFORMACIÓN DISPOSITIVO</h3>
+        <div class="info-grid">
+            <div class="dato-box">
+                <label>Nombre dispositivo</label>
+                <p>{{ disp.nombre }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Fecha de registro</label>
+                <p>{{ disp.fecha_reg }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Fecha de baja</label>
+                <p>{{ disp.fecha_baja }}</p>
+            </div>
+            <div class="dato-box">
+                <label>Paciente asignado</label>
+                <p style="color: var(--admin-primary);">{{ disp.paciente_actual }}</p>
+            </div>
+        </div>
+
+        <h3 class="seccion-titulo" style="margin-top: 32px;">CONFIGURACIONES DISPOSITIVO</h3>
+        <div class="info-grid">
+            {% for key, value in disp.configs.items() %}
+            <div class="dato-box">
+                <label>{{ key }}</label>
+                <p>{{ value }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card-azul">
+        <h3 class="seccion-titulo-azul">RESUMEN DISPOSITIVO</h3>
+        <div class="dato-box azul-espaciado">
+            <label>Total de asignaciones históricas</label>
+            <h2>{{ disp.total_asignaciones }}</h2>
+        </div>
+        <div class="dato-box azul-espaciado">
+            <label>Total de logs registrados</label>
+            <h2>{{ disp.total_logs }}</h2>
+        </div>
+        <div class="actividad-box">
+            <label>Paciente asignado (Actual)</label>
+            <p style="font-size: 16px; font-weight: 600; margin-top: 4px;">{{ disp.paciente_actual }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header">
+        <h3 class="seccion-titulo">PACIENTES ASIGNADOS</h3>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr>
+                <th>NOMBRE</th>
+                <th>ESTADO</th>
+                <th>ENFERMEDAD PRINCIPAL</th>
+                <th>FECHA VINCULACIÓN</th>
+                <th>ACCIÓN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in asignaciones %}
+            <tr>
+                <td><strong>{{ p.nombre }}</strong></td>
+                <td>
+                    <div class="estado-celda">
+                        <div class="status-dot dot-{{ p.estado }}"></div>
+                        <span>Estado {{ p.estado }}</span>
+                    </div>
+                </td>
+                <td>{{ p.enfermedad }}</td>
+                <td>{{ p.fecha_vinc }}</td>
+                <td>
+                    {% if p.activa %}
+                    <a href="#" class="text-danger">Desvincular</a>
+                    {% else %}
+                    <span style="color: var(--admin-text-gray); font-size: 11px;">Histórico</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No hay historial de asignaciones.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="tabla-footer">
+        <a href="#">VER TODOS LOS PACIENTES</a>
+    </div>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header">
+        <h3 class="seccion-titulo">DETECCIONES / LOGS</h3>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr>
+                <th>PERIODO</th>
+                <th>PACIENTE (AL MOMENTO)</th>
+                <th>{% if disp.tipo == 'gps' %}COORDENADAS{% elif disp.tipo == 'nfc' %}MOTIVO{% else %}DISTANCIA PROMEDIO{% endif %}</th>
+                <th>{% if disp.tipo == 'gps' %}DESPLAZAMIENTO{% elif disp.tipo == 'nfc' %}DOCTOR{% else %}PINGS DETECTADOS{% endif %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td><strong>{{ log.fecha }}</strong></td>
+                <td>{{ disp.paciente_actual }}</td>
+                <td style="color: var(--admin-text-gray);">{{ log.col1 }}</td>
+                <td style="color: var(--admin-text-gray);">{{ log.col2 }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">No hay logs registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="tabla-footer">
+        <a href="#">VER TODAS LAS DETECCIONES</a>
+    </div>
+</div>
+{% endblock %}
