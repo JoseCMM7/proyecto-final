@@ -29,8 +29,8 @@
                 <label>ORDENAR POR:</label>
                 <select id="ordenarPacientes">
                     <option value="nombre">Nombre</option>
-                    <option value="fecha_reciente">Ingreso mas reciente</option>
-                    <option value="fecha_antigua">Ingreso mas antiguo</option>
+                    <option value="fecha_reciente">Ingreso más reciente</option>
+                    <option value="fecha_antigua">Ingreso más antiguo</option>
                 </select>
             </div>
 
@@ -46,21 +46,21 @@
             
             <div class="modal-header">
                 <h2>Dar de alta paciente</h2>
-                <p>Complete el expediente clinico y asigne dispositivos IOT para el seguimiento remoto.</p>
+                <p>Complete el expediente clínico y asigne dispositivos IOT para el seguimiento remoto.</p>
             </div>
 
             <form action="{{ url_for('admin.alta_paciente') }}" method="POST">
                 <div class="form-grid">
                     
                     <div class="col-left">
-                        <div class="form-section-title">Informacion Personal</div>
+                        <div class="form-section-title">Información Personal</div>
                         <div class="form-row">
                             <div class="form-group"><label>Primer Nombre</label><input type="text" name="nombre" class="form-control" placeholder="Ej. Juan" required></div>
-                            <div class="form-group"><label>Primer Apellido</label><input type="text" name="apellido" class="form-control" placeholder="Ej. Perez" required></div>
+                            <div class="form-group"><label>Primer Apellido</label><input type="text" name="apellido" class="form-control" placeholder="Ej. Pérez" required></div>
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" class="form-control" required></div>
-                            <div class="form-group"><label>Telefono</label><input type="text" name="telefono" class="form-control" placeholder="+34 000 000 000"></div>
+                            <div class="form-group"><label>Teléfono</label><input type="text" name="telefono" class="form-control" placeholder="+34 000 000 000"></div>
                         </div>
                         <div class="form-group"><label>Email de contacto</label><input type="email" name="email" class="form-control" placeholder="juan@ejemplo.com"></div>
 
@@ -72,7 +72,7 @@
 
                         <div class="form-section-title" style="margin-top: 32px;">Doctores Asignados</div>
                         <div class="form-group">
-                            <label>Seleccionar Medicos (Usa Ctrl/Cmd para elegir varios)</label>
+                            <label>Seleccionar Médicos (Usa Ctrl/Cmd para elegir varios)</label>
                             <select name="doctores_asignados" class="form-control" multiple style="height: 100px;">
                                 {% for doc in doctores %}
                                     <option value="{{ doc.id }}">Dr. {{ doc.nombre }} {{ doc.apellido }}</option>
@@ -115,11 +115,11 @@
                     </div>
 
                     <div class="col-right">
-                        <div class="form-section-title">Informacion Clinica</div>
+                        <div class="form-section-title">Información Clínica</div>
                         <div class="form-group">
-                            <label>Enfermedad / Patologia Principal</label>
-                            <select name="id_enfermedad" class="form-control" required>
-                                <option value="">Seleccione una patologia</option>
+                            <label>Enfermedad / Patología Principal</label>
+                            <select name="id_enfermedad" id="selectEnfermedad" class="form-control" required>
+                                <option value="">Seleccione una patología</option>
                                 {% for enf in enfermedades %}
                                     <option value="{{ enf.id }}">{{ enf.nombre }}</option>
                                 {% endfor %}
@@ -128,29 +128,31 @@
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Grado</label>
-                                <input type="text" name="grado_enfermedad" class="form-control" placeholder="Ej. 2">
+                                <label>Grado / Subtipo</label>
+                                <select name="id_subtipo" id="selectSubtipo" class="form-control" required>
+                                    <option value="">Primero seleccione enfermedad</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label>Fecha Diagnostico</label>
-                                <input type="date" name="fecha_diagnostico" class="form-control">
+                                <label>Fecha Diagnóstico</label>
+                                <input type="date" name="fecha_diagnostico" class="form-control" required>
                             </div>
                         </div>
 
-                        <div class="form-group"><label>Actividad fisica minima recomendada (Pasos/Dia)</label><input type="number" name="actividad_minima" class="form-control" value="0"></div>
+                        <div class="form-group"><label>Actividad física mínima recomendada (Pasos/Día)</label><input type="number" name="actividad_minima" class="form-control" value="0"></div>
 
                         <div class="form-section-title" style="margin-top: 32px;">Familiar Responsable</div>
                         <div class="box-section">
                             <div class="form-row">
                                 <div class="form-group"><label>Nombre</label><input type="text" name="nombre_fam" class="form-control" placeholder="Ej. Ana"></div>
-                                <div class="form-group"><label>Apellido</label><input type="text" name="apellido_fam" class="form-control" placeholder="Ej. Garcia"></div>
+                                <div class="form-group"><label>Apellido</label><input type="text" name="apellido_fam" class="form-control" placeholder="Ej. García"></div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Email</label><input type="email" name="email_fam" class="form-control" placeholder="ana@ejemplo.com"></div>
-                                <div class="form-group"><label>Telefono</label><input type="text" name="telefono_fam" class="form-control" placeholder="+34 600 000 000"></div>
+                                <div class="form-group"><label>Teléfono</label><input type="text" name="telefono_fam" class="form-control" placeholder="+34 600 000 000"></div>
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
-                                <label>Relacion</label>
+                                <label>Relación</label>
                                 <select name="relacion_fam" class="form-control">
                                     <option value="Hijo/a">Hijo/a</option>
                                     <option value="Esposo/a">Esposo/a</option>
@@ -181,4 +183,42 @@
         </div>
         {% endfor %}
     </div>
+
+    <script>
+        document.getElementById('selectEnfermedad').addEventListener('change', function() {
+            var enfermedadId = this.value;
+            var selectSubtipo = document.getElementById('selectSubtipo');
+            
+            selectSubtipo.innerHTML = '<option value="">Cargando...</option>';
+            
+            if (enfermedadId) {
+                // Hacemos la consulta al Backend sin recargar la página
+                var url = "{{ url_for('admin.get_subtipos', enfermedad_id=999999) }}".replace('999999', enfermedadId);
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        selectSubtipo.innerHTML = '<option value="">Seleccione un grado/subtipo</option>';
+                        if (data.length === 0) {
+                            selectSubtipo.innerHTML = '<option value="">No hay subtipos registrados</option>';
+                            selectSubtipo.removeAttribute('required');
+                        } else {
+                            selectSubtipo.setAttribute('required', 'required');
+                            data.forEach(function(subtipo) {
+                                var option = document.createElement('option');
+                                option.value = subtipo.id;
+                                option.textContent = subtipo.descripcion;
+                                selectSubtipo.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        selectSubtipo.innerHTML = '<option value="">Error al cargar</option>';
+                    });
+            } else {
+                selectSubtipo.innerHTML = '<option value="">Primero seleccione enfermedad</option>';
+            }
+        });
+    </script>
 {% endblock %}

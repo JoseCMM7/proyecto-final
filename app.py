@@ -1,7 +1,7 @@
 from flask import Flask
 from models import db
 # Importaciones ajustadas a tu estructura de carpetas
-from routes.admin.admin import admin_bp 
+from routes.admin import admin_bp
 from routes.inicio_sesion import auth_bp
 from routes.doctor import doctor_bp
 from routes.paciente import paciente_bp
