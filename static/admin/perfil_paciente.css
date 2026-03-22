@@ -65,3 +65,79 @@
 .trat-metricas { display: flex; gap: 48px; }
 .metrica label { display: block; font-size: 10px; font-weight: 700; color: var(--admin-text-gray); margin-bottom: 6px; }
 .metrica p { font-size: 14px; font-weight: 600; color: var(--admin-text-dark); }
+
+/* Modificamos la grid para soportar los 3 dispositivos (Beacon, GPS, NFC) */
+.dispositivos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+/* --- SECCIÓN ESTADÍSTICAS --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 60% izquierda, 40% derecha */
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.stat-legend {
+    font-size: 11px;
+    color: var(--admin-text-gray);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot-legend {
+    width: 8px;
+    height: 8px;
+    background-color: var(--admin-primary);
+    border-radius: 50%;
+}
+
+.chart-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.chart-x-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #cbd5e1;
+    text-transform: uppercase;
+}
+
+/* Gráfica de Barras en CSS puro */
+.bar-chart-css {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 150px;
+    margin-top: 32px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.bar {
+    width: 32px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.5s ease-in-out;
+}
+
+.bar-gray { background-color: #e2e8f0; }
+.bar-blue { background-color: var(--admin-primary); }
+
+.stat-insight {
+    font-size: 12px;
+    color: var(--admin-text-gray);
+    line-height: 1.6;
+    font-style: italic;
+}

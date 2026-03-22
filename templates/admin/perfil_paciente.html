@@ -136,6 +136,7 @@
         <div class="botones-header">
             <a href="#" class="btn-outline-primary">+ Asignar Beacon</a>
             <a href="#" class="btn-outline-primary">+ Asignar GPS</a>
+            <a href="#" class="btn-outline-primary">+ Asignar NFC</a>
         </div>
     </div>
     <div class="dispositivos-grid">
@@ -147,15 +148,11 @@
                     <h4>{{ beacon.nombre }}</h4>
                     <p>Registrado: {{ beacon.fecha_registro_beacon.strftime('%d %b %Y') }}</p>
                 </div>
-                <div class="disp-status">
-                    <div class="status-dot dot-activo"></div>
-                    <a href="#" class="text-danger">Quitar</a>
-                </div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#" class="text-danger">Quitar</a></div>
             </div>
-            {% else %}
-            <p class="empty-text">Sin beacons asignados.</p>
-            {% endfor %}
+            {% else %}<p class="empty-text">Sin beacons asignados.</p>{% endfor %}
         </div>
+        
         <div class="dispositivo-col">
             <label class="seccion-titulo" style="font-size: 10px;">GPS</label>
             {% for g in gps %}
@@ -164,16 +161,50 @@
                     <h4>{{ g.nombre }}</h4>
                     <p>Registrado: {{ g.fecha_registro_gps.strftime('%d %b %Y') }}</p>
                 </div>
-                <div class="disp-status">
-                    <div class="status-dot dot-activo"></div>
-                    <a href="#" class="text-danger">Quitar</a>
-                </div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#" class="text-danger">Quitar</a></div>
             </div>
-            {% else %}
-            <p class="empty-text">Sin GPS asignado.</p>
-            {% endfor %}
+            {% else %}<p class="empty-text">Sin GPS asignado.</p>{% endfor %}
+        </div>
+
+        <div class="dispositivo-col">
+            <label class="seccion-titulo" style="font-size: 10px;">NFC</label>
+            {% for n in nfc %}
+            <div class="dispositivo-item">
+                <div class="disp-info">
+                    <h4>{{ n.nombre }}</h4>
+                    <p>Registrado: {{ n.fecha_registro_nfc.strftime('%d %b %Y') }}</p>
+                </div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#" class="text-danger">Quitar</a></div>
+            </div>
+            {% else %}<p class="empty-text">Sin NFC asignado.</p>{% endfor %}
         </div>
     </div>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header" style="padding-bottom: 0;">
+        <h3 class="seccion-titulo">CONTROLES MÉDICOS</h3>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr style="background-color: #f8fafc;">
+                <th>Fecha del control</th>
+                <th>Doctor responsable</th>
+                <th>Notas médicas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in controles %}
+            <tr>
+                <td><strong>{{ c.fecha }}</strong></td>
+                <td>{{ c.doctor }}</td>
+                <td style="color: var(--admin-text-gray);">{{ c.notas }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No hay controles registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <div class="seccion-tratamientos">
@@ -209,5 +240,35 @@
     {% else %}
     <p>No hay tratamientos activos para este paciente.</p>
     {% endfor %}
+</div>
+
+<div class="stats-grid">
+    <div class="card-blanca">
+        <div class="stat-header">
+            <h3 class="seccion-titulo">ACTIVIDAD DIARIA (M)</h3>
+            <span class="stat-legend"><div class="dot-legend"></div> Metros recorridos</span>
+        </div>
+        <div class="chart-container line-chart-mock">
+            <svg viewBox="0 0 500 150" preserveAspectRatio="none" style="width: 100%; height: 150px; stroke: var(--admin-primary); stroke-width: 3; fill: none;">
+                <path d="M 0 100 L 80 80 L 160 110 L 240 40 L 320 60 L 400 20 L 480 50 L 500 70" />
+            </svg>
+            <div class="chart-x-axis">
+                <span>LUN</span><span>MAR</span><span>MIÉ</span><span>JUE</span><span>VIE</span><span>SÁB</span><span>DOM</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-blanca">
+        <h3 class="seccion-titulo">COMPARATIVA SEMANAL</h3>
+        <div class="bar-chart-css">
+            <div class="bar bar-gray" style="height: 40%;"></div>
+            <div class="bar bar-gray" style="height: 60%;"></div>
+            <div class="bar bar-blue" style="height: 90%;"></div>
+            <div class="bar bar-gray" style="height: 50%;"></div>
+        </div>
+        <p class="stat-insight">
+            "El paciente muestra un incremento del 12% en la movilidad respecto a la semana anterior."
+        </p>
+    </div>
 </div>
 {% endblock %}

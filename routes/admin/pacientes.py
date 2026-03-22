@@ -134,15 +134,25 @@ def perfil_paciente(id):
         if fam:
             familiares.append({'datos': fam, 'relacion': rel.relacion})
 
-    # 5. Dispositivos (Beacons y GPS activos)
+    # 5. Dispositivos (Beacons, GPS y NFC activos)
     beacons_asignados = AsignacionBeacon.query.filter_by(id_paciente=id, fecha_retiro=None).all()
     gps_asignados = AsignacionGPS.query.filter_by(id_paciente=id, fecha_retiro=None).all()
+    nfc_asignados = AsignacionNFC.query.filter_by(id_paciente=id, fecha_retiro=None).all()
     
     lista_beacons = [DispositivoBeacon.query.get(b.id_beacon) for b in beacons_asignados]
     lista_gps = [DispositivoGPS.query.get(g.id_gps) for g in gps_asignados]
+    lista_nfc = [DispositivoNFC.query.get(n.id_nfc) for n in nfc_asignados]
 
     # 6. Controles Medicos
-    controles = ControlMedico.query.filter_by(id_paciente=id).order_by(ControlMedico.fecha_control.desc()).all()
+    controles_db = ControlMedico.query.filter_by(id_paciente=id).order_by(ControlMedico.fecha_control.desc()).all()
+    lista_controles = []
+    for c in controles_db:
+        doc = Doctor.query.get(c.id_doctor)
+        lista_controles.append({
+            'fecha': c.fecha_control.strftime('%d %b %Y'),
+            'doctor': f"Dr. {doc.nombre} {doc.apellido}" if doc else "Desconocido",
+            'notas': c.notas
+        })
 
     # 7. Tratamientos
     tratamientos_db = PacienteTratamiento.query.filter_by(id_paciente=id).all()
