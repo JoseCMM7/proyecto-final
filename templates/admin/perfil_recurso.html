@@ -124,7 +124,7 @@
         </tbody>
     </table>
     <div class="tabla-footer">
-        <a href="#">VER TODOS LOS PACIENTES</a>
+        <a href="{{ url_for('admin.pacientes_recurso', tipo=disp.tipo, id=disp.id) }}">VER TODOS LOS PACIENTES</a>
     </div>
 </div>
 

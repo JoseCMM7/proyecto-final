@@ -277,3 +277,48 @@ def baja_recurso(tipo, id):
         flash(f'Error al dar de baja: {str(e)}', 'error')
 
     return redirect(url_for('admin.perfil_recurso', tipo=tipo, id=id))
+
+@admin_bp.route('/recurso/<tipo>/<int:id>/pacientes')
+def pacientes_recurso(tipo, id):
+    if session.get('rol') != 'admin': 
+        return redirect(url_for('auth.login'))
+
+    disp_nombre = ""
+    asignaciones_db = []
+
+    # 1. Buscamos el dispositivo y su historial de asignaciones dependiendo del tipo
+    if tipo == 'gps':
+        d = DispositivoGPS.query.get_or_404(id)
+        disp_nombre = d.nombre
+        asignaciones_db = AsignacionGPS.query.filter_by(id_gps=id).order_by(AsignacionGPS.fecha_asignacion.desc()).all()
+    elif tipo == 'beacon':
+        d = DispositivoBeacon.query.get_or_404(id)
+        disp_nombre = d.nombre
+        asignaciones_db = AsignacionBeacon.query.filter_by(id_beacon=id).order_by(AsignacionBeacon.fecha_asignacion.desc()).all()
+    elif tipo == 'nfc':
+        d = DispositivoNFC.query.get_or_404(id)
+        disp_nombre = d.nombre
+        asignaciones_db = AsignacionNFC.query.filter_by(id_nfc=id).order_by(AsignacionNFC.fecha_asignacion.desc()).all()
+
+    lista_pacientes = []
+    pacientes_agregados = set() # Evitamos mostrar al mismo paciente 2 veces si se le reasignó el mismo aparato
+
+    # 2. Recorremos el historial y armamos las tarjetas
+    for a in asignaciones_db:
+        if a.id_paciente not in pacientes_agregados:
+            p = Paciente.query.get(a.id_paciente)
+            if p:
+                est = HistorialEstado.query.filter_by(id_paciente=p.id, fecha_fin=None).first()
+                lista_pacientes.append({
+                    'id': p.id,
+                    'nombre': f"{p.nombre} {p.apellido}",
+                    'fecha_ingreso': p.fecha_ingreso.strftime('%d/%m/%Y'),
+                    'estado': est.estado.lower() if est else 'verde',
+                    'fecha_raw': p.fecha_ingreso.strftime('%Y-%m-%d') if p.fecha_ingreso else "1970-01-01",
+                    'asignacion_activa': True if not a.fecha_retiro else False
+                })
+                pacientes_agregados.add(p.id)
+
+    datos_disp = {'id': id, 'tipo': tipo, 'nombre': disp_nombre}
+    
+    return render_template('admin/pacientes_recurso.html', disp=datos_disp, pacientes=lista_pacientes)

@@ -1,0 +1,117 @@
+{% extends 'admin/base_admin.html' %}
+{% block title %}Pacientes - {{ disp.nombre }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="breadcrumb">
+        <a href="{{ url_for('admin.recursos') }}">INVENTARIO</a> / 
+        <a href="{{ url_for('admin.perfil_recurso', tipo=disp.tipo, id=disp.id) }}" style="text-transform: uppercase;">{{ disp.nombre }}</a> / 
+        <span>PACIENTES ASIGNADOS</span>
+    </div>
+
+    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px; color: var(--admin-text-dark);">Historial de pacientes: {{ disp.nombre }}</h2>
+
+    <div class="action-toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar pacientes..." id="buscadorPacientes">
+        </div>
+        
+        <div class="filters-container">
+            <div class="select-group">
+                <label>FILTRAR POR ESTADO:</label>
+                <select id="filtroEstado">
+                    <option value="todos">Todos los estados</option>
+                    <option value="rojo">Estado Rojo</option>
+                    <option value="amarillo">Estado Amarillo</option>
+                    <option value="verde">Estado Verde</option>
+                </select>
+            </div>
+
+            <div class="select-group">
+                <label>ORDENAR POR:</label>
+                <select id="ordenarPacientes">
+                    <option value="nombre">Nombre</option>
+                    <option value="fecha_reciente">Ingreso más reciente</option>
+                    <option value="fecha_antigua">Ingreso más antiguo</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="patients-simple-grid" id="gridPacientes" style="margin-top: 32px;">
+        {% for p in pacientes %}
+        <a href="{{ url_for('admin.perfil_paciente', id=p.id) }}" 
+           class="patient-card-simple paciente-card"
+           data-nombre="{{ p.nombre | lower }}"
+           data-estado="{{ p.estado }}"
+           data-fecha="{{ p.fecha_raw }}"
+           style="text-decoration: none; display: flex;">
+             
+            <div class="patient-card-info">
+                <h3 style="color: var(--admin-text-dark); display: flex; align-items: center;">
+                    {{ p.nombre }}
+                    {% if p.asignacion_activa %}
+                    <span style="font-size: 9px; font-weight: 800; background: #dcfce7; color: #166534; padding: 3px 6px; border-radius: 4px; margin-left: 10px; letter-spacing: 0.5px;">ACTIVO</span>
+                    {% endif %}
+                </h3>
+                <p style="color: var(--admin-text-gray);"><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso }}</p>
+            </div>
+            <div class="status-dot dot-{{ p.estado }}"></div>
+        </a>
+        {% else %}
+        <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">Este dispositivo no tiene un historial de pacientes asignados aún.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        const buscadorPacientes = document.getElementById('buscadorPacientes');
+        const filtroEstadoPacientes = document.getElementById('filtroEstado');
+        const ordenSelectPacientes = document.getElementById('ordenarPacientes');
+        const gridPacientes = document.getElementById('gridPacientes');
+
+        function actualizarTableroPacientes() {
+            const textoBusqueda = buscadorPacientes.value.toLowerCase();
+            const estadoSeleccionado = filtroEstadoPacientes.value;
+            const modoOrden = ordenSelectPacientes.value;
+            
+            let tarjetas = Array.from(gridPacientes.getElementsByClassName('paciente-card'));
+
+            tarjetas.forEach(tarjeta => {
+                const nombre = tarjeta.getAttribute('data-nombre');
+                const estado = tarjeta.getAttribute('data-estado');
+                
+                const cumpleBusqueda = nombre.includes(textoBusqueda);
+                const cumpleFiltro = (estadoSeleccionado === 'todos' || estado === estadoSeleccionado);
+
+                if (cumpleBusqueda && cumpleFiltro) {
+                    tarjeta.style.display = ''; 
+                } else {
+                    tarjeta.style.display = 'none'; 
+                }
+            });
+
+            let tarjetasVisibles = tarjetas.filter(t => t.style.display !== 'none');
+
+            tarjetasVisibles.sort((a, b) => {
+                if (modoOrden === 'nombre') {
+                    return a.getAttribute('data-nombre').localeCompare(b.getAttribute('data-nombre'));
+                } else if (modoOrden === 'fecha_reciente') {
+                    return new Date(b.getAttribute('data-fecha')) - new Date(a.getAttribute('data-fecha'));
+                } else if (modoOrden === 'fecha_antigua') {
+                    return new Date(a.getAttribute('data-fecha')) - new Date(b.getAttribute('data-fecha'));
+                }
+            });
+
+            tarjetasVisibles.forEach(tarjeta => gridPacientes.appendChild(tarjeta));
+        }
+
+        buscadorPacientes.addEventListener('input', actualizarTableroPacientes);
+        filtroEstadoPacientes.addEventListener('change', actualizarTableroPacientes);
+        ordenSelectPacientes.addEventListener('change', actualizarTableroPacientes);
+    </script>
+{% endblock %}
