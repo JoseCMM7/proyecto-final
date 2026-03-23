@@ -19,19 +19,30 @@
         <nav class="sidebar">
             <div class="sidebar-header">
                 <div class="logo-container">
-                    <i class="fas fa-stethoscope"></i>
-                    <h1>HealthNode</h1>
+                    <h1 style="color: var(--admin-primary); font-weight: 700;">HealthNode</h1>
                 </div>
-                <p>PORTAL MÉDICO</p>
+                <p style="text-transform: uppercase;">DOCTOR DASHBOARD</p>
             </div>
 
             <div class="sidebar-menu">
                 <a href="{{ url_for('doctor.home') }}" class="menu-item {% if request.endpoint == 'doctor.home' %}active{% endif %}">
-                    <i class="fas fa-home"></i> Home
+                    <i class="fas fa-home" style="width: 20px; text-align: center;"></i> Home
                 </a>
                 
-                <a href="#" class="menu-item {% if request.endpoint == 'doctor.mis_pacientes' %}active{% endif %}">
-                    <i class="fas fa-user-injured"></i> Mis Pacientes
+                <a href="#" class="menu-item {% if request.endpoint == 'doctor.pacientes' %}active{% endif %}">
+                    <i class="far fa-user" style="width: 20px; text-align: center;"></i> Pacientes
+                </a>
+
+                <a href="#" class="menu-item {% if request.endpoint == 'doctor.controles' %}active{% endif %}">
+                    <i class="fas fa-clipboard-list" style="width: 20px; text-align: center;"></i> Controles Médicos
+                </a>
+
+                <a href="#" class="menu-item {% if request.endpoint == 'doctor.tratamientos' %}active{% endif %}">
+                    <i class="fas fa-pills" style="width: 20px; text-align: center;"></i> Tratamientos
+                </a>
+
+                <a href="#" class="menu-item {% if request.endpoint == 'doctor.indicadores' %}active{% endif %}">
+                    <i class="fas fa-chart-bar" style="width: 20px; text-align: center;"></i> Indicadores Clínicos
                 </a>
             </div>
 
@@ -40,7 +51,7 @@
                     Dr. {{ doctor.nombre }} {{ doctor.apellido }}
                 </div>
                 <a href="{{ url_for('auth.logout') }}" class="menu-item logout-link" style="padding-left: 0; margin-top: 8px;">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    <i class="fas fa-sign-out-alt" style="width: 20px; text-align: center;"></i> Cerrar Sesión
                 </a>
             </div>
         </nav>
