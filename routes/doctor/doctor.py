@@ -196,35 +196,29 @@ def registrar_control(id):
         db.session.add(nuevo_control)
         db.session.flush() # Genera el ID para usarlo abajo sin cerrar transacción
         
-        # 4. Procesar las 3 filas de indicadores (Creación dinámica)
-        for i in range(1, 4):
-            nombre_ind = request.form.get(f'nombre_ind_{i}')
-            unidad_ind = request.form.get(f'unidad_ind_{i}')
+        # 4. Procesar hasta 5 indicadores (Evitando duplicados)
+        indicadores_procesados = set() # Memoria temporal para esta consulta
+        
+        for i in range(1, 6):
+            id_ind = request.form.get(f'id_ind_{i}')
             valor_ind = request.form.get(f'valor_ind_{i}')
             
-            # Solo procesamos si el doctor escribió un nombre y un valor numérico
-            if nombre_ind and valor_ind:
-                nombre_limpio = nombre_ind.strip()
-                unidad_limpia = unidad_ind.strip() if unidad_ind else "N/A" # Unidad por defecto
+            # Solo procesamos si el doctor seleccionó un indicador y puso un número
+            if id_ind and valor_ind:
                 
-                # A) Buscamos si el indicador ya existe en la base de datos (ignorando mayúsculas/minúsculas)
-                indicador = IndicadorClinico.query.filter(IndicadorClinico.nombre.ilike(nombre_limpio)).first()
+                # REGLA CLÍNICA: Si ya procesamos este indicador hoy, saltamos (ignoramos el duplicado)
+                if id_ind in indicadores_procesados:
+                    continue
+                    
+                # Si es nuevo en esta sesión, lo anotamos en la memoria temporal
+                indicadores_procesados.add(id_ind)
                 
-                # B) Si NO existe, lo creamos y lo guardamos en el catálogo de inmediato
-                if not indicador:
-                    indicador = IndicadorClinico(
-                        nombre=nombre_limpio, 
-                        unidad_medida=unidad_limpia
-                    )
-                    db.session.add(indicador)
-                    db.session.flush() # Esto genera el ID del nuevo indicador
-                
-                # C) Registramos el valor del paciente vinculándolo al indicador (nuevo o existente)
+                # Y lo guardamos en la base de datos
                 nuevo_reg = RegistroIndicador(
                     valor=float(valor_ind),
                     fecha_registro=fecha_control.date(),
                     id_control=nuevo_control.id,
-                    id_indicador=indicador.id
+                    id_indicador=id_ind
                 )
                 db.session.add(nuevo_reg)
                 

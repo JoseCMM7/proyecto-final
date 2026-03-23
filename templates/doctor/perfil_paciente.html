@@ -206,23 +206,24 @@
                 </div>
             </div>
 
-            <div class="form-section-title">SECCION 3 — INDICADORES REGISTRADOS</div>
+            <div class="form-section-title">SECCIÓN 3 — INDICADORES REGISTRADOS</div>
             <div class="box-section">
-                <p style="font-size: 12px; color: var(--admin-text-gray); margin-bottom: 16px;">Registre hasta 3 indicadores. Si el indicador no existe, el sistema lo creara automaticamente:</p>
+                <p style="font-size: 12px; color: var(--admin-text-gray); margin-bottom: 16px;">Seleccione hasta 5 indicadores de la lista. El sistema ignorará automáticamente los indicadores duplicados en una misma sesión.</p>
                 
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 12px; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
-                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">NOMBRE DEL INDICADOR</label>
-                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">UNIDAD</label>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 12px; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
+                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">INDICADOR CLÍNICO</label>
                     <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">VALOR</label>
                 </div>
 
-                {% for i in range(1, 4) %}
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 12px; align-items: center;">
+                {% for i in range(1, 6) %}
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 12px; align-items: center;">
                     <div class="form-group" style="margin-bottom: 0;">
-                        <input type="text" name="nombre_ind_{{ i }}" class="form-control" placeholder="Ej. Presion Arterial">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <input type="text" name="unidad_ind_{{ i }}" class="form-control" placeholder="Ej. mmHg">
+                        <select name="id_ind_{{ i }}" class="form-control">
+                            <option value="">-- Seleccionar Indicador --</option>
+                            {% for ind in indicadores_disponibles %}
+                                <option value="{{ ind.id }}">{{ ind.nombre }} ({{ ind.unidad_medida }})</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
                         <input type="number" step="0.01" name="valor_ind_{{ i }}" class="form-control" placeholder="0.00">
