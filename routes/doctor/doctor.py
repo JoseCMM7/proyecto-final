@@ -196,18 +196,35 @@ def registrar_control(id):
         db.session.add(nuevo_control)
         db.session.flush() # Genera el ID para usarlo abajo sin cerrar transacción
         
-        # 4. Procesar las 3 filas de indicadores opcionales
+        # 4. Procesar las 3 filas de indicadores (Creación dinámica)
         for i in range(1, 4):
-            id_ind = request.form.get(f'indicador_{i}')
-            valor_ind = request.form.get(f'valor_{i}')
+            nombre_ind = request.form.get(f'nombre_ind_{i}')
+            unidad_ind = request.form.get(f'unidad_ind_{i}')
+            valor_ind = request.form.get(f'valor_ind_{i}')
             
-            # Solo si el doctor llenó ambos campos en esa fila
-            if id_ind and valor_ind: 
+            # Solo procesamos si el doctor escribió un nombre y un valor numérico
+            if nombre_ind and valor_ind:
+                nombre_limpio = nombre_ind.strip()
+                unidad_limpia = unidad_ind.strip() if unidad_ind else "N/A" # Unidad por defecto
+                
+                # A) Buscamos si el indicador ya existe en la base de datos (ignorando mayúsculas/minúsculas)
+                indicador = IndicadorClinico.query.filter(IndicadorClinico.nombre.ilike(nombre_limpio)).first()
+                
+                # B) Si NO existe, lo creamos y lo guardamos en el catálogo de inmediato
+                if not indicador:
+                    indicador = IndicadorClinico(
+                        nombre=nombre_limpio, 
+                        unidad_medida=unidad_limpia
+                    )
+                    db.session.add(indicador)
+                    db.session.flush() # Esto genera el ID del nuevo indicador
+                
+                # C) Registramos el valor del paciente vinculándolo al indicador (nuevo o existente)
                 nuevo_reg = RegistroIndicador(
                     valor=float(valor_ind),
                     fecha_registro=fecha_control.date(),
                     id_control=nuevo_control.id,
-                    id_indicador=id_ind
+                    id_indicador=indicador.id
                 )
                 db.session.add(nuevo_reg)
                 

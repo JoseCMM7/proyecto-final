@@ -17,22 +17,22 @@
         <h1>{{ paciente.nombre }} {{ paciente.apellido }}</h1>
         <span class="badge-estado {{ estado | lower }}">ESTADO {{ estado }}</span>
     </div>
-    <p class="subtitulo">Expediente Clínico Electrónico</p>
-    </div>
+    <p class="subtitulo">Expediente Clinico Electronico</p>
+</div>
 
 <div class="top-cards-grid">
     <div class="card-blanca">
-        <h3 class="seccion-titulo">INFORMACIÓN PERSONAL</h3>
+        <h3 class="seccion-titulo">INFORMACION PERSONAL</h3>
         <div class="info-grid">
             <div class="dato-box"><label>Nombre</label><p>{{ paciente.nombre }} {{ paciente.apellido }}</p></div>
             <div class="dato-box"><label>Fecha de nacimiento</label><p>{{ paciente.fecha_nacimiento.strftime('%d %b %Y') }}</p></div>
-            <div class="dato-box"><label>Teléfono</label><p>{{ paciente.telefono or 'No registrado' }}</p></div>
+            <div class="dato-box"><label>Telefono</label><p>{{ paciente.telefono or 'No registrado' }}</p></div>
             <div class="dato-box"><label>Email</label><p>{{ paciente.email or 'No registrado' }}</p></div>
         </div>
     </div>
 
     <div class="card-azul">
-        <h3 class="seccion-titulo-azul">DIAGNÓSTICO PRINCIPAL</h3>
+        <h3 class="seccion-titulo-azul">DIAGNOSTICO PRINCIPAL</h3>
         <div class="resumen-flex">
             <div class="dato-principal">
                 <label>Enfermedad</label>
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="actividad-box">
-            <label>Meta de actividad física</label>
+            <label>Meta de actividad fisica</label>
             <div class="metros">
                 <h2>{{ paciente.actividad_minima }}</h2> <span>metros diarios</span>
             </div>
@@ -58,7 +58,7 @@
     </div>
     <table class="tabla-limpia">
         <thead>
-            <tr><th>Nombre</th><th>Parentesco</th><th>Email</th><th>Teléfono</th></tr>
+            <tr><th>Nombre</th><th>Parentesco</th><th>Email</th><th>Telefono</th></tr>
         </thead>
         <tbody>
             {% for fam in familiares %}
@@ -132,7 +132,7 @@
 
 <div class="card-lista" style="margin-top: 32px;">
     <div class="card-lista-header" style="padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
-        <h3 class="seccion-titulo">HISTORIAL DE CONTROLES MÉDICOS</h3>
+        <h3 class="seccion-titulo">HISTORIAL DE CONTROLES MEDICOS</h3>
         
         <a href="#modalRegistrarControl" style="color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--admin-primary); padding: 8px 16px; border-radius: 6px;">
             + Registrar Control
@@ -142,8 +142,8 @@
         <thead>
             <tr style="background-color: #f8fafc;">
                 <th>Fecha</th>
-                <th>Médico Evaluador</th>
-                <th>Notas Clínicas</th>
+                <th>Medico Evaluador</th>
+                <th>Notas Clinicas</th>
             </tr>
         </thead>
         <tbody>
@@ -154,7 +154,7 @@
                 <td style="color: var(--admin-text-gray);">{{ c.notas }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="3">No hay notas de evolución registradas aún.</td></tr>
+            <tr><td colspan="3">No hay notas de evolucion registradas aun.</td></tr>
             {% endfor %}
         </tbody>
     </table>
@@ -165,7 +165,7 @@
         <a href="#" class="modal-close" style="text-decoration: none; position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); font-size: 20px;"><i class="fas fa-times"></i></a>
         
         <div class="modal-header" style="margin-bottom: 32px; text-align: left;">
-            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Registrar control clínico</h2>
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Registrar control clinico</h2>
         </div>
 
         <form action="{{ url_for('doctor.registrar_control', id=paciente.id) }}" method="POST" style="text-align: left;">
@@ -175,10 +175,10 @@
                 <input type="text" class="form-control" value="{{ paciente.nombre }} {{ paciente.apellido }}" readonly style="background-color: #f8fafc; color: var(--admin-text-gray);">
             </div>
 
-            <div class="form-section-title">SECCIÓN 2 — CONTROL</div>
+            <div class="form-section-title">SECCION 2 — CONTROL</div>
             <div class="box-section" style="margin-bottom: 32px;">
                 <div class="form-group">
-                    <label>TÍTULO DEL CONTROL</label>
+                    <label>TITULO DEL CONTROL</label>
                     <input type="text" name="titulo" class="form-control" placeholder="Ej. Control de Seguimiento de Glucosa" required>
                 </div>
                 <div class="form-row">
@@ -194,39 +194,38 @@
                 <div class="form-group">
                     <label>ESTADO DEL CONTROL</label>
                     <select name="estado_clinico" class="form-control" required>
-                        <option value="">Seleccione el estado clínico actual...</option>
+                        <option value="">Seleccione el estado clinico actual...</option>
                         <option value="estable">Estable</option>
                         <option value="mejora">Mejora</option>
                         <option value="deterioro">Deterioro</option>
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>NOTAS MÉDICAS</label>
-                    <textarea name="notas" class="form-control" rows="4" placeholder="Escriba las observaciones clínicas del control..." style="resize: none;"></textarea>
+                    <label>NOTAS MEDICAS</label>
+                    <textarea name="notas" class="form-control" rows="4" placeholder="Escriba las observaciones clinicas del control..." style="resize: none;"></textarea>
                 </div>
             </div>
 
-            <div class="form-section-title">SECCIÓN 3 — INDICADORES REGISTRADOS</div>
+            <div class="form-section-title">SECCION 3 — INDICADORES REGISTRADOS</div>
             <div class="box-section">
-                <p style="font-size: 12px; color: var(--admin-text-gray); margin-bottom: 16px;">Registre hasta 3 indicadores en esta sesión (Opcional):</p>
+                <p style="font-size: 12px; color: var(--admin-text-gray); margin-bottom: 16px;">Registre hasta 3 indicadores. Si el indicador no existe, el sistema lo creara automaticamente:</p>
                 
-                <div class="form-row" style="margin-bottom: 12px; align-items: center; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
-                    <label style="font-size: 10px; color: var(--admin-text-gray);">INDICADOR</label>
-                    <label style="font-size: 10px; color: var(--admin-text-gray);">VALOR</label>
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 12px; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
+                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">NOMBRE DEL INDICADOR</label>
+                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">UNIDAD</label>
+                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">VALOR</label>
                 </div>
 
                 {% for i in range(1, 4) %}
-                <div class="form-row" style="margin-bottom: 12px; align-items: center;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 12px; align-items: center;">
                     <div class="form-group" style="margin-bottom: 0;">
-                        <select name="indicador_{{ i }}" class="form-control">
-                            <option value="">-- Seleccionar Indicador --</option>
-                            {% for ind in indicadores_disponibles %}
-                                <option value="{{ ind.id }}">{{ ind.nombre }} ({{ ind.unidad_medida }})</option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" name="nombre_ind_{{ i }}" class="form-control" placeholder="Ej. Presion Arterial">
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
-                        <input type="number" step="0.01" name="valor_{{ i }}" class="form-control" placeholder="0.00">
+                        <input type="text" name="unidad_ind_{{ i }}" class="form-control" placeholder="Ej. mmHg">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="number" step="0.01" name="valor_ind_{{ i }}" class="form-control" placeholder="0.00">
                     </div>
                 </div>
                 {% endfor %}
