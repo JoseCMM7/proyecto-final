@@ -122,7 +122,8 @@ def perfil_paciente(id):
     gps = [DispositivoGPS.query.get(g.id_gps) for g in AsignacionGPS.query.filter_by(id_paciente=id, fecha_retiro=None).all()]
     nfc = [DispositivoNFC.query.get(n.id_nfc) for n in AsignacionNFC.query.filter_by(id_paciente=id, fecha_retiro=None).all()]
 
-    controles_db = ControlMedico.query.filter_by(id_paciente=id).order_by(ControlMedico.fecha_control.desc()).all()
+    # 5. Controles Médicos Históricos (¡SÓLO LOS DEL DOCTOR!)
+    controles_db = ControlMedico.query.filter_by(id_paciente=id, id_doctor=doctor.id).order_by(ControlMedico.fecha_control.desc()).all()
     lista_controles = [{'fecha': c.fecha_control.strftime('%d %b %Y'), 'doctor': f"Dr. {Doctor.query.get(c.id_doctor).nombre} {Doctor.query.get(c.id_doctor).apellido}" if Doctor.query.get(c.id_doctor) else "Desconocido", 'notas': c.notas} for c in controles_db]
 
     tratamientos_db = PacienteTratamiento.query.filter_by(id_paciente=id).all()
@@ -194,3 +195,33 @@ def registrar_control(id):
         db.session.rollback()
         
     return redirect(url_for('doctor.perfil_paciente', id=id))
+
+@doctor_bp.route('/mis_controles')
+def mis_controles():
+    if session.get('rol') != 'doctor': return redirect(url_for('auth.login'))
+    doctor = Doctor.query.filter_by(id_usuario=session['user_id']).first()
+    
+    # Si el doctor hizo clic desde el perfil de un paciente, filtramos. Si no, mostramos todos.
+    paciente_id = request.args.get('paciente_id')
+    if paciente_id:
+        controles_db = ControlMedico.query.filter_by(id_doctor=doctor.id, id_paciente=paciente_id).order_by(ControlMedico.fecha_control.desc()).all()
+        paciente_filtro = Paciente.query.get(paciente_id)
+        nombre_filtro = f"{paciente_filtro.nombre} {paciente_filtro.apellido}" if paciente_filtro else None
+    else:
+        controles_db = ControlMedico.query.filter_by(id_doctor=doctor.id).order_by(ControlMedico.fecha_control.desc()).all()
+        nombre_filtro = None
+        
+    lista_controles = []
+    for c in controles_db:
+        pac = Paciente.query.get(c.id_paciente)
+        lista_controles.append({
+            'id': c.id,
+            'paciente_nombre': f"{pac.nombre} {pac.apellido}" if pac else "Desconocido",
+            'paciente_id': pac.id if pac else None,
+            'fecha': c.fecha_control.strftime('%d/%m/%Y'),
+            'fecha_raw': c.fecha_control.strftime('%Y-%m-%d'),
+            'notas': c.notas or "Sin notas adicionales registradas.",
+            'estado_clinico': c.estado_clinico
+        })
+        
+    return render_template('doctor/mis_controles.html', doctor=doctor, controles=lista_controles, nombre_filtro=nombre_filtro)

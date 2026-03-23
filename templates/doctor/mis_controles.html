@@ -1,0 +1,102 @@
+{% extends 'doctor/base_control.html' %}
+{% block title %}Mis Controles Médicos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/pacientes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/controles_doctor.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="breadcrumb">
+        <a href="{{ url_for('doctor.home') }}">DOCTORES</a> / 
+        <span style="text-transform: uppercase;">CONTROLES MÉDICOS</span>
+    </div>
+
+    <div style="margin-bottom: 32px;">
+        <h2 style="font-size: 32px; font-weight: 700; color: var(--admin-text-dark);">
+            {% if nombre_filtro %} Controles de {{ nombre_filtro }} {% else %} Controles Médicos {% endif %}
+        </h2>
+        <p style="font-size: 16px; color: var(--admin-text-gray); margin-top: 4px;">Dr. {{ doctor.nombre }} {{ doctor.apellido }}</p>
+    </div>
+
+    <div class="action-toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar pacientes o notas..." id="buscadorControles">
+        </div>
+        
+        <div class="filters-container">
+            <div class="select-group">
+                <label>ORDENAR POR:</label>
+                <select id="ordenarControles">
+                    <option value="fecha_reciente">Fecha (Más reciente)</option>
+                    <option value="fecha_antigua">Fecha (Más antigua)</option>
+                    <option value="paciente_asc">Paciente (A-Z)</option>
+                </select>
+            </div>
+
+            <div class="select-group">
+                <label>FILTRAR POR:</label>
+                <select id="filtroEstadoClinico">
+                    <option value="todos">Todos los estados</option>
+                    <option value="estable">Estable</option>
+                    <option value="mejora">Mejora</option>
+                    <option value="deterioro">Deterioro</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="controles-grid" id="gridControles">
+        {% for c in controles %}
+        <a href="{{ url_for('doctor.perfil_paciente', id=c.paciente_id) }}" 
+           class="control-card control-item"
+           data-paciente="{{ c.paciente_nombre | lower }}"
+           data-notas="{{ c.notas | lower }}"
+           data-fecha="{{ c.fecha_raw }}"
+           data-estado="{{ c.estado_clinico | lower }}">
+            
+            <h3>{{ c.paciente_nombre }}</h3>
+            <p class="fecha"><i class="far fa-calendar-alt"></i> Fecha: {{ c.fecha }}</p>
+            <p class="notas">"{{ c.notas }}"</p>
+        </a>
+        {% else %}
+        <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No has registrado controles médicos aún.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        const buscador = document.getElementById('buscadorControles');
+        const filtroEstado = document.getElementById('filtroEstadoClinico');
+        const ordenSelect = document.getElementById('ordenarControles');
+        const grid = document.getElementById('gridControles');
+
+        function actualizarTablero() {
+            const textoBusqueda = buscador.value.toLowerCase();
+            const estadoSeleccionado = filtroEstado.value;
+            const modoOrden = ordenSelect.value;
+            let tarjetas = Array.from(grid.getElementsByClassName('control-item'));
+
+            tarjetas.forEach(tarjeta => {
+                const paciente = tarjeta.getAttribute('data-paciente');
+                const notas = tarjeta.getAttribute('data-notas');
+                const estado = tarjeta.getAttribute('data-estado');
+                const cumpleBusqueda = paciente.includes(textoBusqueda) || notas.includes(textoBusqueda);
+                const cumpleFiltro = (estadoSeleccionado === 'todos' || estado === estadoSeleccionado);
+                tarjeta.style.display = (cumpleBusqueda && cumpleFiltro) ? '' : 'none'; 
+            });
+
+            let tarjetasVisibles = tarjetas.filter(t => t.style.display !== 'none');
+            tarjetasVisibles.sort((a, b) => {
+                if (modoOrden === 'fecha_reciente') return new Date(b.getAttribute('data-fecha')) - new Date(a.getAttribute('data-fecha'));
+                else if (modoOrden === 'fecha_antigua') return new Date(a.getAttribute('data-fecha')) - new Date(b.getAttribute('data-fecha'));
+                else if (modoOrden === 'paciente_asc') return a.getAttribute('data-paciente').localeCompare(b.getAttribute('data-paciente'));
+            });
+            tarjetasVisibles.forEach(tarjeta => grid.appendChild(tarjeta));
+        }
+        buscador.addEventListener('input', actualizarTablero);
+        filtroEstado.addEventListener('change', actualizarTablero);
+        ordenSelect.addEventListener('change', actualizarTablero);
+    </script>
+{% endblock %}
