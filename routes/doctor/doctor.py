@@ -1,7 +1,11 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request
+from datetime import datetime
 from models import (
-    db, Doctor, HistorialEstado,
-    AsignacionGPS, AsignacionBeacon, AsignacionNFC
+    db, Doctor, Paciente, HistorialEstado, PacienteEnfermedad, Enfermedad, 
+    SubtipoEnfermedad, Familiar, PacienteFamiliar, AsignacionBeacon, 
+    AsignacionGPS, AsignacionNFC, DispositivoBeacon, DispositivoGPS, 
+    DispositivoNFC, ControlMedico, PacienteTratamiento, Tratamiento,
+    IndicadorClinico, RegistroIndicador
 )
 
 doctor_bp = Blueprint('doctor', __name__)
@@ -156,8 +160,59 @@ def perfil_paciente(id):
             'descripcion': trat_info.descripcion if trat_info else 'Sin descripcion', 'doctor_nombre': f"Dr. {doc_info.nombre} {doc_info.apellido}" if doc_info else 'No registrado'
         })
 
+        indicadores_disponibles = IndicadorClinico.query.all()
+
     return render_template('doctor/perfil_paciente.html', 
                            doctor=doctor, paciente=paciente, estado=estado_actual, 
                            enfermedad=enfermedad_nombre, subtipo=subtipo_desc, 
                            familiares=familiares, beacons=beacons, gps=gps, nfc=nfc, 
                            controles=lista_controles, tratamientos=lista_tratamientos)
+
+@doctor_bp.route('/mi_paciente/<int:id>/registrar_control', methods=['POST'])
+def registrar_control(id):
+    if session.get('rol') != 'doctor': return redirect(url_for('auth.login'))
+    doctor = Doctor.query.filter_by(id_usuario=session['user_id']).first()
+    
+    # 1. Recuperar los datos del formulario (Cero JS)
+    titulo = request.form.get('titulo')
+    fecha_str = request.form.get('fecha')
+    hora_str = request.form.get('hora')
+    estado = request.form.get('estado_clinico')
+    notas = request.form.get('notas')
+    
+    # 2. Combinar la fecha y hora para el Timestamp de PostgreSQL
+    fecha_control = datetime.strptime(f"{fecha_str} {hora_str}", '%Y-%m-%d %H:%M')
+    
+    try:
+        # 3. Guardar el Control Médico
+        nuevo_control = ControlMedico(
+            titulo=titulo,
+            estado_clinico=estado,
+            fecha_control=fecha_control,
+            notas=notas,
+            id_paciente=id,
+            id_doctor=doctor.id
+        )
+        db.session.add(nuevo_control)
+        db.session.flush() # Genera el ID para usarlo abajo sin cerrar transacción
+        
+        # 4. Procesar las 3 filas de indicadores opcionales
+        for i in range(1, 4):
+            id_ind = request.form.get(f'indicador_{i}')
+            valor_ind = request.form.get(f'valor_{i}')
+            
+            # Solo si el doctor llenó ambos campos en esa fila
+            if id_ind and valor_ind: 
+                nuevo_reg = RegistroIndicador(
+                    valor=float(valor_ind),
+                    fecha_registro=fecha_control.date(),
+                    id_control=nuevo_control.id,
+                    id_indicador=id_ind
+                )
+                db.session.add(nuevo_reg)
+                
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        
+    return redirect(url_for('doctor.perfil_paciente', id=id))

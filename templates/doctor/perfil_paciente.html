@@ -134,7 +134,7 @@
     <div class="card-lista-header" style="padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
         <h3 class="seccion-titulo">HISTORIAL DE CONTROLES MÉDICOS</h3>
         
-        <a href="#" style="color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--admin-primary); padding: 8px 16px; border-radius: 6px;">
+        <a href="#modalRegistrarControl" style="color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--admin-primary); padding: 8px 16px; border-radius: 6px;">
             + Registrar Control
         </a>
     </div>
@@ -158,5 +158,85 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<div class="modal-overlay" id="modalRegistrarControl">
+    <div class="modal-content" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 40px; position: relative;">
+        <a href="#" class="modal-close" style="text-decoration: none; position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); font-size: 20px;"><i class="fas fa-times"></i></a>
+        
+        <div class="modal-header" style="margin-bottom: 32px; text-align: left;">
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Registrar control clínico</h2>
+        </div>
+
+        <form action="{{ url_for('doctor.registrar_control', id=paciente.id) }}" method="POST" style="text-align: left;">
+            <div class="form-section-title">PACIENTE</div>
+            <div class="form-group" style="margin-bottom: 32px;">
+                <label>SELECCIONAR PACIENTE</label>
+                <input type="text" class="form-control" value="{{ paciente.nombre }} {{ paciente.apellido }}" readonly style="background-color: #f8fafc; color: var(--admin-text-gray);">
+            </div>
+
+            <div class="form-section-title">SECCIÓN 2 — CONTROL</div>
+            <div class="box-section" style="margin-bottom: 32px;">
+                <div class="form-group">
+                    <label>TÍTULO DEL CONTROL</label>
+                    <input type="text" name="titulo" class="form-control" placeholder="Ej. Control de Seguimiento de Glucosa" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>FECHA</label>
+                        <input type="date" name="fecha" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>HORA</label>
+                        <input type="time" name="hora" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ESTADO DEL CONTROL</label>
+                    <select name="estado_clinico" class="form-control" required>
+                        <option value="">Seleccione el estado clínico actual...</option>
+                        <option value="estable">Estable</option>
+                        <option value="mejora">Mejora</option>
+                        <option value="deterioro">Deterioro</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>NOTAS MÉDICAS</label>
+                    <textarea name="notas" class="form-control" rows="4" placeholder="Escriba las observaciones clínicas del control..." style="resize: none;"></textarea>
+                </div>
+            </div>
+
+            <div class="form-section-title">SECCIÓN 3 — INDICADORES REGISTRADOS</div>
+            <div class="box-section">
+                <p style="font-size: 12px; color: var(--admin-text-gray); margin-bottom: 16px;">Registre hasta 3 indicadores en esta sesión (Opcional):</p>
+                
+                <div class="form-row" style="margin-bottom: 12px; align-items: center; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
+                    <label style="font-size: 10px; color: var(--admin-text-gray);">INDICADOR</label>
+                    <label style="font-size: 10px; color: var(--admin-text-gray);">VALOR</label>
+                </div>
+
+                {% for i in range(1, 4) %}
+                <div class="form-row" style="margin-bottom: 12px; align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <select name="indicador_{{ i }}" class="form-control">
+                            <option value="">-- Seleccionar Indicador --</option>
+                            {% for ind in indicadores_disponibles %}
+                                <option value="{{ ind.id }}">{{ ind.nombre }} ({{ ind.unidad_medida }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="number" step="0.01" name="valor_{{ i }}" class="form-control" placeholder="0.00">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="modal-footer" style="margin-top: 32px;">
+                <a href="#" class="btn-secondary">Descartar cambios</a>
+                <button type="submit" class="btn-primary">Guardar Control</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
