@@ -17,7 +17,37 @@
         <span class="badge-estado {{ estado | lower }}">ESTADO {{ estado }}</span>
     </div>
     <p class="subtitulo">Perfil del paciente</p>
-    <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+    
+    <div class="menu-opciones" tabindex="0">
+        <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+        <div class="dropdown-content">
+            <a href="{{ url_for('admin.editar_paciente', id=paciente.id) }}" class="dropdown-item">
+                <i class="fas fa-edit"></i> Editar datos
+            </a>
+            <a href="#confirmar-eliminar" class="dropdown-item item-peligro">
+                <i class="fas fa-trash-alt"></i> Eliminar paciente
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="confirmar-eliminar" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
+            <h3>Eliminar paciente</h3>
+        </div>
+        <p>¿Estás seguro de que deseas eliminar este paciente? Esta acción no se puede deshacer y se borrarán todos los registros asociados.</p>
+        
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.eliminar_paciente', id=paciente.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">
+                    Eliminar
+                </button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
 </div>
 
 <div class="top-cards-grid">

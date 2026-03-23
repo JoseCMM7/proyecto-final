@@ -1,6 +1,6 @@
 /* static/admin/perfiles_base.css */
 
-/* Breadcrumb & Header */
+/* --- 1. BREADCRUMB & HEADER --- */
 .breadcrumb { font-size: 12px; color: var(--admin-text-gray); margin-bottom: 24px; }
 .breadcrumb a { color: var(--admin-text-gray); text-decoration: none; }
 .breadcrumb span { color: var(--admin-text-dark); font-weight: 600; }
@@ -9,10 +9,63 @@
 .titulo-estado { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
 .titulo-estado h1 { font-size: 32px; font-weight: 700; color: var(--admin-text-dark); }
 .subtitulo { font-size: 14px; color: var(--admin-text-gray); }
-.btn-opciones { position: absolute; right: 0; top: 0; background: none; border: none; font-size: 20px; color: var(--admin-text-dark); cursor: pointer; }
 .seccion-titulo { font-size: 11px; font-weight: 700; color: var(--admin-text-gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
 
-/* Top Cards Grid */
+/* --- 2. MENÚ DESPLEGABLE FORZADO (PURO CSS) --- */
+.menu-opciones {
+    position: absolute;
+    right: 0;
+    top: 0;
+    outline: none;
+}
+
+.btn-opciones {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--admin-text-gray);
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.dropdown-content {
+    display: none !important; /* Forzamos ocultarlo por defecto */
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #ffffff;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 100;
+    border-radius: 8px;
+    border: 1px solid var(--admin-border);
+}
+
+/* Mostrar al hacer clic o pasar el mouse */
+.menu-opciones:focus-within .dropdown-content,
+.menu-opciones:hover .dropdown-content {
+    display: block !important;
+}
+
+.dropdown-item {
+    color: var(--admin-text-dark);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dropdown-item i { color: var(--admin-text-gray); width: 16px; }
+.dropdown-item:hover { background-color: #f8fafc; }
+
+.item-peligro { color: #b91c1c; }
+.item-peligro i { color: #b91c1c; }
+.item-peligro:hover { background-color: #fee2e2; }
+
+/* --- 3. TOP CARDS GRID --- */
 .top-cards-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; margin-bottom: 24px; }
 
 .card-blanca { background: #fff; border-radius: 12px; padding: 32px; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); }
@@ -27,10 +80,88 @@
 .azul-espaciado { margin-bottom: 32px; }
 .actividad-box { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px; }
 
-/* Card Listas (Tablas) */
+/* --- 4. CARD LISTAS (TABLAS) --- */
 .card-lista { background: #fff; border-radius: 12px; padding: 0; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); margin-bottom: 24px; overflow: hidden; }
 .card-lista-header { padding: 32px 32px 16px 32px; }
 .tabla-limpia { width: 100%; border-collapse: collapse; }
 .tabla-limpia th { text-align: left; padding: 16px 32px; font-size: 11px; color: var(--admin-text-gray); border-bottom: 1px solid var(--admin-border); font-weight: 600; }
 .tabla-limpia td { padding: 16px 32px; font-size: 13px; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-dark); }
 .text-danger { color: var(--alert-red); font-weight: 600; text-decoration: none; font-size: 12px; }
+
+/* --- 5. CUADRO DE CONFIRMACIÓN (DISEÑO EXACTO) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none; 
+    justify-content: center; align-items: center;
+}
+
+.modal-overlay:target { display: flex; }
+
+.modal-content {
+    background: white;
+    padding: 32px 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header-alerta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.modal-header-alerta h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--admin-text-dark);
+    margin: 0;
+}
+
+.modal-content p {
+    font-size: 14px;
+    color: var(--admin-text-gray);
+    margin-bottom: 32px;
+    line-height: 1.5;
+    padding: 0 16px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.btn-modal {
+    padding: 12px 0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+}
+
+.btn-confirmar-eliminar {
+    background: #b91c1c; 
+    color: white;
+}
+
+.btn-confirmar-eliminar:hover { background: #991b1b; }
+
+.btn-cancelar {
+    background: #f1f5f9;
+    color: var(--admin-text-dark);
+    width: 48%;
+    box-sizing: border-box;
+}
+
+.btn-cancelar:hover { background: #e2e8f0; }

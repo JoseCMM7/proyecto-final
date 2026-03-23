@@ -187,3 +187,37 @@ def perfil_paciente(id):
                            nfc=lista_nfc,                  # <-- AQUI ENVIAMOS LOS NFC
                            controles=lista_controles,      # <-- AQUI ENVIAMOS LOS CONTROLES (Esta era la clave)
                            tratamientos=lista_tratamientos)
+
+@admin_bp.route('/paciente/<int:id>/eliminar', methods=['POST'])
+def eliminar_paciente(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    paciente = Paciente.query.get_or_404(id)
+    
+    try:
+        # En entornos clínicos hacemos un "Soft Delete" para no corromper la DB
+        paciente.fecha_baja_paciente = date.today()
+        
+        # Opcional: También podemos actualizar su estado a 'INACTIVO' en el historial si lo deseas
+        
+        db.session.commit()
+        flash(f'El paciente {paciente.nombre} ha sido dado de baja correctamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar el paciente: {str(e)}', 'error')
+
+    # Redirigimos a la tabla general de pacientes
+    return redirect(url_for('admin.pacientes'))
+
+@admin_bp.route('/paciente/<int:id>/editar', methods=['GET', 'POST'])
+def editar_paciente(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    paciente = Paciente.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        # Aquí irá la lógica para guardar los cambios del formulario
+        pass
+        
+    # Por ahora solo cargamos la vista (crearemos el HTML a continuación)
+    return render_template('admin/editar_paciente.html', paciente=paciente)
