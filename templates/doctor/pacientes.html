@@ -1,0 +1,60 @@
+{% extends 'doctor/base_control.html' %}
+
+{% block title %}Mis Pacientes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='doctor/pacientes_doctor.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="breadcrumb">
+        <span style="color: var(--admin-text-gray);">Doctores / Dr. {{ doctor.nombre }} / </span> 
+        <span style="color: var(--admin-text-dark); font-weight: 600;">Pacientes Asignados</span>
+    </div>
+
+    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px; color: var(--admin-text-dark);">Pacientes del Dr. {{ doctor.nombre }}</h2>
+
+    <form method="GET" action="{{ url_for('doctor.pacientes') }}" class="toolbar-form">
+        <div class="search-box" style="margin: 0; flex: 1; max-width: 300px;">
+            <i class="fas fa-search"></i>
+            <input type="text" name="q" placeholder="Buscar pacientes..." value="{{ busqueda }}">
+        </div>
+        
+        <div class="toolbar-filters">
+            <div class="select-group">
+                <label>FILTRAR POR ESTADO:</label>
+                <select name="estado">
+                    <option value="todos" {% if filtro_estado == 'todos' %}selected{% endif %}>Todos los estados</option>
+                    <option value="rojo" {% if filtro_estado == 'rojo' %}selected{% endif %}>Estado Rojo</option>
+                    <option value="amarillo" {% if filtro_estado == 'amarillo' %}selected{% endif %}>Estado Amarillo</option>
+                    <option value="verde" {% if filtro_estado == 'verde' %}selected{% endif %}>Estado Verde</option>
+                </select>
+            </div>
+
+            <div class="select-group">
+                <label>ORDENAR POR:</label>
+                <select name="orden">
+                    <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Nombre</option>
+                    <option value="fecha_reciente" {% if orden == 'fecha_reciente' %}selected{% endif %}>Ingreso más reciente</option>
+                    <option value="fecha_antigua" {% if orden == 'fecha_antigua' %}selected{% endif %}>Ingreso más antiguo</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-filtrar">Aplicar</button>
+        </div>
+    </form>
+
+    <div class="patients-simple-grid">
+        {% for p in pacientes %}
+        <a href="#" class="patient-card-simple clickable-card">
+            <div class="patient-card-info">
+                <h3 style="color: var(--admin-text-dark);">{{ p.nombre }}</h3>
+                <p style="color: var(--admin-text-gray);"><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso_str }}</p>
+            </div>
+            <div class="status-dot dot-{{ p.estado }}"></div>
+        </a>
+        {% else %}
+        <p style="color: var(--admin-text-gray); grid-column: 1 / -1;">No se encontraron pacientes que coincidan con los filtros aplicados.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

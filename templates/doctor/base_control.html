@@ -29,7 +29,7 @@
                     <i class="fas fa-home" style="width: 20px; text-align: center;"></i> Home
                 </a>
                 
-                <a href="#" class="menu-item {% if request.endpoint == 'doctor.pacientes' %}active{% endif %}">
+                <a href="{{ url_for('doctor.pacientes') }}" class="menu-item {% if request.endpoint == 'doctor.pacientes' %}active{% endif %}">
                     <i class="far fa-user" style="width: 20px; text-align: center;"></i> Pacientes
                 </a>
 
