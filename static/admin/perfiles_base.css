@@ -134,3 +134,35 @@
     height: 8px; 
     border-radius: 50%; 
 }
+
+/* --- 7. FOOTER DE TABLAS Y ESTADOS --- */
+
+/* Centrar y darle espacio al fondo de la tabla */
+.tabla-footer {
+    padding: 16px;
+    text-align: center;
+    border-top: 1px solid var(--admin-border);
+    background-color: #f8fafc; /* Un gris muy sutil para que contraste con la tabla */
+}
+
+/* Estilo de botón para los enlaces de ver más */
+.tabla-footer a {
+    color: var(--admin-primary);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+}
+
+.tabla-footer a:hover {
+    color: #1e3a8a;
+    text-decoration: underline;
+}
+
+/* Alinear perfectamente el puntito de estado con su texto */
+.estado-celda {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
