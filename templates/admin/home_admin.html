@@ -30,20 +30,16 @@
 
     <div class="lists-container">
         <section class="patient-list-section red-alerts-section">
-            <div class="section-header">
-                <h2>Pacientes en alerta roja</h2>
-            </div>
-
             <div class="patient-cards-grid">
                 {% for paciente in pacientes_rojos %}
-                <div class="patient-card red-alert">
+                <a href="{{ url_for('admin.perfil_paciente', id=paciente.id) }}" class="patient-card red-alert">
                     <div class="state-bar"></div>
                     <div class="patient-info">
-                        <h3>{{ paciente.nombre }} {{ paciente.apellido }}</h3>
+                        <h3 style="color: var(--admin-text-dark);">{{ paciente.nombre }} {{ paciente.apellido }}</h3>
                         <p>ID: #{{ paciente.id }}</p>
                     </div>
                     <div class="status-dot"></div>
-                </div>
+                </a>
                 {% else %}
                 <p class="card-subtext" style="padding: 20px;">
                     No hay pacientes en estado critico actualmente.
@@ -53,21 +49,16 @@
         </section>
 
         <section class="patient-list-section yellow-states-section">
-            <div class="section-header">
-                <h2>Pacientes en estado amarillo</h2>
-                <p>Requiere monitoreo continuo</p>
-            </div>
-
             <div class="patient-cards-grid">
                 {% for paciente in pacientes_amarillos %}
-                <div class="patient-card yellow-state">
+                <a href="{{ url_for('admin.perfil_paciente', id=paciente.id) }}" class="patient-card yellow-state">
                     <div class="state-bar"></div>
                     <div class="patient-info">
-                        <h3>{{ paciente.nombre }} {{ paciente.apellido }}</h3>
+                        <h3 style="color: var(--admin-text-dark);">{{ paciente.nombre }} {{ paciente.apellido }}</h3>
                         <p>ID: #{{ paciente.id }}</p>
                     </div>
                     <div class="status-dot"></div>
-                </div>
+                </a>
                 {% else %}
                 <p class="card-subtext" style="padding: 20px;">
                     No hay pacientes en estado amarillo actualmente.

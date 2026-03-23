@@ -184,4 +184,6 @@ def perfil_paciente(id):
                            familiares=familiares,
                            beacons=lista_beacons,
                            gps=lista_gps,
-                           tratamientos=lista_tratamientos) # <-- Pasamos la nueva lista
+                           nfc=lista_nfc,                  # <-- AQUI ENVIAMOS LOS NFC
+                           controles=lista_controles,      # <-- AQUI ENVIAMOS LOS CONTROLES (Esta era la clave)
+                           tratamientos=lista_tratamientos)

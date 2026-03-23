@@ -93,6 +93,18 @@
     gap: 16px;
     position: relative;
     overflow: hidden;
+    
+    /* NUEVO: Quitar subrayado y hacer la transición suave */
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+}
+
+/* NUEVO: El efecto de levitación al pasar el ratón */
+.patient-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px -8px rgba(20, 85, 211, 0.3);
+    border-color: #bfdbfe;
 }
 
 .state-bar {
