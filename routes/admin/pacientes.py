@@ -121,8 +121,6 @@ def perfil_paciente(id):
         subtipo_desc = sub.descripcion if sub else "N/A"
 
     doctores = paciente.doctores
-    
-    # Doctores disponibles para asignar (que NO tiene ya asignados)
     doctores_asignados_ids = [d.id for d in doctores]
     if doctores_asignados_ids:
         doctores_para_asignar = Doctor.query.filter(~Doctor.id.in_(doctores_asignados_ids)).all()
@@ -184,8 +182,7 @@ def perfil_paciente(id):
                            paciente=paciente, estado=estado_actual, enfermedad=enfermedad_nombre, subtipo=subtipo_desc, 
                            doctores=doctores, familiares=familiares, beacons=lista_beacons, gps=lista_gps, nfc=lista_nfc, 
                            controles=lista_controles, tratamientos=lista_tratamientos, doctores_disponibles=doctores_disponibles, 
-                           doctores_para_asignar=doctores_para_asignar, # AQUI PASAMOS LOS DOCTORES LIBRES
-                           enfermedades_disponibles=enfermedades_disponibles, subtipos_actuales=subtipos_actuales, 
+                           doctores_para_asignar=doctores_para_asignar, enfermedades_disponibles=enfermedades_disponibles, subtipos_actuales=subtipos_actuales, 
                            paciente_enf=paciente_enf, familiar_actual=familiar_actual, relacion_actual=relacion_actual, 
                            usuario_paciente=usuario_paciente, gps_lista=gps_lista, bea_lista=bea_lista, nfc_lista=nfc_lista, 
                            current_gps=current_gps, current_beacon=current_beacon, current_nfc=current_nfc)
@@ -301,13 +298,11 @@ def eliminar_paciente(id):
         flash(f'Error al eliminar el paciente: {str(e)}', 'error')
     return redirect(url_for('admin.pacientes'))
 
-# --- NUEVAS RUTAS DE DOCTORES ---
 @admin_bp.route('/paciente/<int:id>/asignar_doctor', methods=['POST'])
 def asignar_doctor(id):
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     paciente = Paciente.query.get_or_404(id)
     doc_id = request.form.get('id_doctor')
-    
     try:
         if doc_id:
             doctor = Doctor.query.get(doc_id)
@@ -320,7 +315,6 @@ def asignar_doctor(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error al asignar doctor: {str(e)}', 'error')
-        
     return redirect(url_for('admin.perfil_paciente', id=id))
 
 @admin_bp.route('/paciente/<int:id_paciente>/quitar_doctor/<int:id_doctor>', methods=['POST'])
@@ -328,7 +322,6 @@ def quitar_doctor(id_paciente, id_doctor):
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     paciente = Paciente.query.get_or_404(id_paciente)
     doctor = Doctor.query.get_or_404(id_doctor)
-    
     try:
         if doctor in paciente.doctores:
             paciente.doctores.remove(doctor)
@@ -337,48 +330,32 @@ def quitar_doctor(id_paciente, id_doctor):
     except Exception as e:
         db.session.rollback()
         flash(f'Error al quitar doctor: {str(e)}', 'error')
-        
     return redirect(url_for('admin.perfil_paciente', id=id_paciente))
 
-# --- NUEVAS RUTAS DE FAMILIARES ---
 @admin_bp.route('/paciente/<int:id>/agregar_familiar', methods=['POST'])
 def agregar_familiar(id):
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
-    
     email_fam_val = request.form.get('email_fam', '').strip()
     fam_email = email_fam_val if email_fam_val else None
-    
     try:
-        # Verificamos si el familiar ya existe por su correo
         existente = Familiar.query.filter_by(email=fam_email).first() if fam_email else None
-        
         if existente:
-            # Si ya existe, solo lo vinculamos a este paciente
             db.session.add(PacienteFamiliar(id_paciente=id, id_familiar=existente.id, relacion=request.form.get('relacion_fam'), fecha_creacion_cuenta=date.today()))
         else:
-            # Si no existe, creamos el registro nuevo
-            nuevo_fam = Familiar(
-                nombre=request.form.get('nombre_fam'), 
-                apellido=request.form.get('apellido_fam'), 
-                email=fam_email, 
-                numero=request.form.get('telefono_fam')
-            )
+            nuevo_fam = Familiar(nombre=request.form.get('nombre_fam'), apellido=request.form.get('apellido_fam'), email=fam_email, numero=request.form.get('telefono_fam'))
             db.session.add(nuevo_fam)
             db.session.flush()
             db.session.add(PacienteFamiliar(id_paciente=id, id_familiar=nuevo_fam.id, relacion=request.form.get('relacion_fam'), fecha_creacion_cuenta=date.today()))
-            
         db.session.commit()
         flash('Familiar agregado exitosamente.', 'success')
     except Exception as e:
         db.session.rollback()
         flash(f'Error al agregar familiar: {str(e)}', 'error')
-        
     return redirect(url_for('admin.perfil_paciente', id=id))
 
 @admin_bp.route('/paciente/<int:id_paciente>/quitar_familiar/<int:id_familiar>', methods=['POST'])
 def quitar_familiar(id_paciente, id_familiar):
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
-    
     try:
         relacion = PacienteFamiliar.query.filter_by(id_paciente=id_paciente, id_familiar=id_familiar).first()
         if relacion:
@@ -388,5 +365,66 @@ def quitar_familiar(id_paciente, id_familiar):
     except Exception as e:
         db.session.rollback()
         flash(f'Error al quitar familiar: {str(e)}', 'error')
+    return redirect(url_for('admin.perfil_paciente', id=id_paciente))
+
+# --- NUEVAS RUTAS DE DISPOSITIVOS ---
+@admin_bp.route('/paciente/<int:id>/asignar_dispositivo/<tipo>', methods=['POST'])
+def asignar_dispositivo(id, tipo):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    disp_id = request.form.get('id_dispositivo')
+    if not disp_id:
+        flash(f'Por favor selecciona un {tipo.upper()} de la lista.', 'error')
+        return redirect(url_for('admin.perfil_paciente', id=id))
         
+    try:
+        ahora = datetime.now()
+        hoy = date.today()
+        
+        if tipo == 'beacon':
+            actual = AsignacionBeacon.query.filter_by(id_paciente=id, fecha_retiro=None).first()
+            if actual and str(actual.id_beacon) != str(disp_id): actual.fecha_retiro = ahora
+            if not actual or str(actual.id_beacon) != str(disp_id): 
+                db.session.add(AsignacionBeacon(fecha_asignacion=ahora, id_paciente=id, id_beacon=disp_id))
+                
+        elif tipo == 'gps':
+            actual = AsignacionGPS.query.filter_by(id_paciente=id, fecha_retiro=None).first()
+            if actual and str(actual.id_gps) != str(disp_id): actual.fecha_retiro = ahora
+            if not actual or str(actual.id_gps) != str(disp_id): 
+                db.session.add(AsignacionGPS(fecha_asignacion=ahora, id_paciente=id, id_gps=disp_id))
+                
+        elif tipo == 'nfc':
+            actual = AsignacionNFC.query.filter_by(id_paciente=id, fecha_retiro=None).first()
+            if actual and str(actual.id_nfc) != str(disp_id): actual.fecha_retiro = hoy
+            if not actual or str(actual.id_nfc) != str(disp_id): 
+                db.session.add(AsignacionNFC(fecha_asignacion=hoy, id_paciente=id, id_nfc=disp_id))
+
+        db.session.commit()
+        flash(f'{tipo.upper()} asignado exitosamente al paciente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al asignar {tipo}: {str(e)}', 'error')
+
+    return redirect(url_for('admin.perfil_paciente', id=id))
+
+@admin_bp.route('/paciente/<int:id_paciente>/quitar_dispositivo/<tipo>/<int:id_disp>', methods=['POST'])
+def quitar_dispositivo(id_paciente, tipo, id_disp):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    try:
+        if tipo == 'beacon':
+            asig = AsignacionBeacon.query.filter_by(id_paciente=id_paciente, id_beacon=id_disp, fecha_retiro=None).first()
+            if asig: asig.fecha_retiro = datetime.now()
+        elif tipo == 'gps':
+            asig = AsignacionGPS.query.filter_by(id_paciente=id_paciente, id_gps=id_disp, fecha_retiro=None).first()
+            if asig: asig.fecha_retiro = datetime.now()
+        elif tipo == 'nfc':
+            asig = AsignacionNFC.query.filter_by(id_paciente=id_paciente, id_nfc=id_disp, fecha_retiro=None).first()
+            if asig: asig.fecha_retiro = date.today()
+
+        db.session.commit()
+        flash(f'{tipo.upper()} desvinculado correctamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al quitar {tipo}: {str(e)}', 'error')
+
     return redirect(url_for('admin.perfil_paciente', id=id_paciente))

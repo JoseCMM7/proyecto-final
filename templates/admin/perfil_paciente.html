@@ -146,9 +146,9 @@
     <div class="card-lista-header">
         <h3 class="seccion-titulo">DISPOSITIVOS</h3>
         <div class="botones-header">
-            <a href="#" class="btn-outline-primary">+ Asignar Beacon</a>
-            <a href="#" class="btn-outline-primary">+ Asignar GPS</a>
-            <a href="#" class="btn-outline-primary">+ Asignar NFC</a>
+            <a href="#modalAsignarBeacon" class="btn-outline-primary">+ Asignar Beacon</a>
+            <a href="#modalAsignarGPS" class="btn-outline-primary">+ Asignar GPS</a>
+            <a href="#modalAsignarNFC" class="btn-outline-primary">+ Asignar NFC</a>
         </div>
     </div>
     <div class="dispositivos-grid">
@@ -160,7 +160,7 @@
                     <h4>{{ beacon.nombre }}</h4>
                     <p>Registrado: {{ beacon.fecha_registro_beacon.strftime('%d %b %Y') }}</p>
                 </div>
-                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#" class="text-danger">Quitar</a></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#modalQuitarBeacon-{{ beacon.id }}" class="text-danger">Quitar</a></div>
             </div>
             {% else %}<p class="empty-text">Sin beacons asignados.</p>{% endfor %}
         </div>
@@ -173,7 +173,7 @@
                     <h4>{{ g.nombre }}</h4>
                     <p>Registrado: {{ g.fecha_registro_gps.strftime('%d %b %Y') }}</p>
                 </div>
-                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#" class="text-danger">Quitar</a></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#modalQuitarGPS-{{ g.id }}" class="text-danger">Quitar</a></div>
             </div>
             {% else %}<p class="empty-text">Sin GPS asignado.</p>{% endfor %}
         </div>
@@ -186,7 +186,7 @@
                     <h4>{{ n.nombre }}</h4>
                     <p>Registrado: {{ n.fecha_registro_nfc.strftime('%d %b %Y') }}</p>
                 </div>
-                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#" class="text-danger">Quitar</a></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#modalQuitarNFC-{{ n.id }}" class="text-danger">Quitar</a></div>
             </div>
             {% else %}<p class="empty-text">Sin NFC asignado.</p>{% endfor %}
         </div>
@@ -512,4 +512,101 @@
         </form>
     </div>
 </div>
+
+<div class="modal-overlay" id="modalAsignarBeacon">
+    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
+        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
+        <div class="modal-header" style="margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar Beacon</h2>
+            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Seleccione el beacon a vincular.</p>
+        </div>
+        <form action="{{ url_for('admin.asignar_dispositivo', id=paciente.id, tipo='beacon') }}" method="POST">
+            <select name="id_dispositivo" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" required>
+                <option value="">-- Seleccione un Beacon --</option>
+                {% for b in bea_lista %}<option value="{{ b.id }}">{{ b.nombre }}</option>{% endfor %}
+            </select>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
+                <a href="#" class="btn-secondary" style="color: var(--admin-text-gray); text-decoration: none; padding: 12px 24px; font-weight: 600;">Cancelar</a>
+                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalAsignarGPS">
+    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
+        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
+        <div class="modal-header" style="margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar GPS</h2>
+        </div>
+        <form action="{{ url_for('admin.asignar_dispositivo', id=paciente.id, tipo='gps') }}" method="POST">
+            <select name="id_dispositivo" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" required>
+                <option value="">-- Seleccione un GPS --</option>
+                {% for g in gps_lista %}<option value="{{ g.id }}">{{ g.nombre }}</option>{% endfor %}
+            </select>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
+                <a href="#" class="btn-secondary" style="color: var(--admin-text-gray); text-decoration: none; padding: 12px 24px; font-weight: 600;">Cancelar</a>
+                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalAsignarNFC">
+    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
+        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
+        <div class="modal-header" style="margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar NFC</h2>
+        </div>
+        <form action="{{ url_for('admin.asignar_dispositivo', id=paciente.id, tipo='nfc') }}" method="POST">
+            <select name="id_dispositivo" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" required>
+                <option value="">-- Seleccione un NFC --</option>
+                {% for n in nfc_lista %}<option value="{{ n.id }}">{{ n.nombre }}</option>{% endfor %}
+            </select>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
+                <a href="#" class="btn-secondary" style="color: var(--admin-text-gray); text-decoration: none; padding: 12px 24px; font-weight: 600;">Cancelar</a>
+                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% for beacon in beacons %}
+<div id="modalQuitarBeacon-{{ beacon.id }}" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular Beacon</h3></div>
+        <p>¿Seguro que deseas desvincular el beacon <strong>{{ beacon.nombre }}</strong>?</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='beacon', id_disp=beacon.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button></form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for g in gps %}
+<div id="modalQuitarGPS-{{ g.id }}" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular GPS</h3></div>
+        <p>¿Seguro que deseas desvincular el GPS <strong>{{ g.nombre }}</strong>?</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='gps', id_disp=g.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button></form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for n in nfc %}
+<div id="modalQuitarNFC-{{ n.id }}" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular NFC</h3></div>
+        <p>¿Seguro que deseas desvincular el dispositivo NFC <strong>{{ n.nombre }}</strong>?</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='nfc', id_disp=n.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button></form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
