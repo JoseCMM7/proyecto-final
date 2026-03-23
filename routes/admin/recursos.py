@@ -205,29 +205,31 @@ def eliminar_recurso(tipo, id):
 
     try:
         if tipo == 'gps':
-            # 1. Buscamos el dispositivo
             dispositivo = DispositivoGPS.query.get_or_404(id)
-            
-            # 2. Eliminamos manualmente sus dependencias para evitar errores de Foreign Key
             RegistroGPS.query.filter_by(id_gps=id).delete()
             AsignacionGPS.query.filter_by(id_gps=id).delete()
-            
-            # 3. Eliminamos el dispositivo
             db.session.delete(dispositivo)
-            db.session.commit()
-            
-            flash('Dispositivo GPS y todo su historial han sido eliminados permanentemente.', 'success')
             
         elif tipo == 'beacon':
-            # Lógica lista para cuando quieras implementar la eliminación de Beacons
-            pass
+            dispositivo = DispositivoBeacon.query.get_or_404(id)
+            # Limpiamos dependencias del Beacon
+            RegistroBeacon.query.filter_by(id_beacon=id).delete()
+            AsignacionBeacon.query.filter_by(id_beacon=id).delete()
+            db.session.delete(dispositivo)
             
         elif tipo == 'nfc':
-            # Lógica lista para cuando quieras implementar la eliminación de NFC
-            pass
+            dispositivo = DispositivoNFC.query.get_or_404(id)
+            # Limpiamos dependencias del NFC para evitar error de Llave Foránea
+            RegistroNFC.query.filter_by(id_nfc=id).delete()
+            AsignacionNFC.query.filter_by(id_nfc=id).delete()
+            db.session.delete(dispositivo)
+
+        # Confirmamos la eliminación en la base de datos
+        db.session.commit()
+        flash(f'Dispositivo {tipo.upper()} y todo su historial han sido eliminados permanentemente.', 'success')
 
     except Exception as e:
-        db.session.rollback() # Si algo falla, deshacemos cualquier cambio a medias
+        db.session.rollback() 
         flash(f'Error al eliminar el dispositivo: {str(e)}', 'error')
 
     # Redirigimos al inventario general
