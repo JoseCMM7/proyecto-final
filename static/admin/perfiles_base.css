@@ -5,179 +5,132 @@
 .breadcrumb a { color: var(--admin-text-gray); text-decoration: none; }
 .breadcrumb span { color: var(--admin-text-dark); font-weight: 600; }
 
-.perfil-header { position: relative; margin-bottom: 32px; }
-.titulo-estado { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
+.perfil-header { position: relative; margin-bottom: 40px; }
+.titulo-estado { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
 .titulo-estado h1 { font-size: 32px; font-weight: 700; color: var(--admin-text-dark); }
 .subtitulo { font-size: 14px; color: var(--admin-text-gray); }
-.seccion-titulo { font-size: 11px; font-weight: 700; color: var(--admin-text-gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
+.seccion-titulo { font-size: 11px; font-weight: 700; color: var(--admin-text-gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px; }
 
 /* --- 2. MENÚ DESPLEGABLE FORZADO (PURO CSS) --- */
-.menu-opciones {
-    position: absolute;
-    right: 0;
-    top: 0;
-    outline: none;
-}
-
-.btn-opciones {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: var(--admin-text-gray);
-    cursor: pointer;
-    padding: 8px 12px;
-}
-
-.dropdown-content {
-    display: none !important; /* Forzamos ocultarlo por defecto */
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: #ffffff;
-    min-width: 180px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 100;
-    border-radius: 8px;
-    border: 1px solid var(--admin-border);
-}
-
-/* Mostrar al hacer clic o pasar el mouse */
-.menu-opciones:focus-within .dropdown-content,
-.menu-opciones:hover .dropdown-content {
-    display: block !important;
-}
-
-.dropdown-item {
-    color: var(--admin-text-dark);
-    padding: 12px 16px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 13px;
-    font-weight: 500;
-}
-
+.menu-opciones { position: absolute; right: 0; top: 0; outline: none; }
+.btn-opciones { background: none; border: none; font-size: 18px; color: var(--admin-text-gray); cursor: pointer; padding: 8px 12px; }
+.dropdown-content { display: none !important; position: absolute; right: 0; top: 100%; background-color: #ffffff; min-width: 180px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; border-radius: 8px; border: 1px solid var(--admin-border); }
+.menu-opciones:focus-within .dropdown-content, .menu-opciones:hover .dropdown-content { display: block !important; }
+.dropdown-item { color: var(--admin-text-dark); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; }
 .dropdown-item i { color: var(--admin-text-gray); width: 16px; }
 .dropdown-item:hover { background-color: #f8fafc; }
-
 .item-peligro { color: #b91c1c; }
 .item-peligro i { color: #b91c1c; }
 .item-peligro:hover { background-color: #fee2e2; }
 
-/* --- 3. TOP CARDS GRID --- */
-.top-cards-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; margin-bottom: 24px; }
+/* --- 3. TOP CARDS GRID (AQUI ESTA LA MEJORA DE ESPACIO) --- */
+.top-cards-grid { display: grid; grid-template-columns: 1fr 350px; gap: 32px; margin-bottom: 32px; }
 
-.card-blanca { background: #fff; border-radius: 12px; padding: 32px; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); }
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.dato-box label { display: block; font-size: 11px; color: var(--admin-text-gray); margin-bottom: 4px; }
-.dato-box p { font-size: 14px; font-weight: 600; color: var(--admin-text-dark); }
+.card-blanca { background: #fff; border-radius: 12px; padding: 40px 32px; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); }
+/* Aumentamos el gap vertical de 24px a 32px para que no se vea apretado */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 24px; } 
+.dato-box label { display: block; font-size: 11px; color: var(--admin-text-gray); margin-bottom: 8px; } 
+/* Aumentamos levemente el tamaño de letra a 15px para más legibilidad */
+.dato-box p { font-size: 15px; font-weight: 600; color: var(--admin-text-dark); line-height: 1.4; } 
 
-.card-azul { background: #1e3a8a; border-radius: 12px; padding: 32px; color: white; box-shadow: 0 10px 25px rgba(30,58,138,0.3); display: flex; flex-direction: column; }
-.seccion-titulo-azul { font-size: 11px; font-weight: 700; color: #93c5fd; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px; }
-.card-azul .dato-box label, .card-azul .actividad-box label { color: #93c5fd; font-size: 11px; display: block; margin-bottom: 4px; }
-.card-azul .dato-box h2, .card-azul .actividad-box h2 { font-size: 36px; font-weight: 700; }
-.azul-espaciado { margin-bottom: 32px; }
-.actividad-box { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px; }
+.card-azul { background: #1e3a8a; border-radius: 12px; padding: 40px 32px; color: white; box-shadow: 0 10px 25px rgba(30,58,138,0.3); display: flex; flex-direction: column; }
+.seccion-titulo-azul { font-size: 11px; font-weight: 700; color: #93c5fd; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 32px; }
+.card-azul .dato-box label, .card-azul .actividad-box label { color: #93c5fd; font-size: 11px; display: block; margin-bottom: 6px; }
+.card-azul .dato-box h2, .card-azul .actividad-box h2 { font-size: 36px; font-weight: 700; line-height: 1.1; }
+.azul-espaciado { margin-bottom: 40px; }
+.actividad-box { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px; margin-top: auto; }
 
 /* --- 4. CARD LISTAS (TABLAS) --- */
-.card-lista { background: #fff; border-radius: 12px; padding: 0; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); margin-bottom: 24px; overflow: hidden; }
-.card-lista-header { 
-    padding: 32px 32px 16px 32px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-}
+.card-lista { background: #fff; border-radius: 12px; padding: 0; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); margin-bottom: 32px; overflow: hidden; }
+/* Alineamos correctamente los botones "+ Asignar" */
+.card-lista-header { padding: 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; margin-bottom: 0; }
+.card-lista-header .seccion-titulo { margin-bottom: 0; }
 
-.btn-text-primary { 
-    color: var(--admin-primary); 
-    font-size: 13px; 
-    font-weight: 600; 
-    text-decoration: none; 
-}
+.btn-text-primary { color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; }
+.btn-text-primary:hover { text-decoration: underline; }
 
-.btn-text-primary:hover {
-    text-decoration: underline;
-}
 .tabla-limpia { width: 100%; border-collapse: collapse; }
-.tabla-limpia th { text-align: left; padding: 16px 32px; font-size: 11px; color: var(--admin-text-gray); border-bottom: 1px solid var(--admin-border); font-weight: 600; }
-.tabla-limpia td { padding: 16px 32px; font-size: 13px; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-dark); }
+.tabla-limpia th { text-align: left; padding: 16px 32px; font-size: 11px; color: var(--admin-text-gray); border-bottom: 1px solid var(--admin-border); font-weight: 600; background-color: #f8fafc; }
+/* Aumentamos el padding interno de las tablas para que respiren más */
+.tabla-limpia td { padding: 20px 32px; font-size: 14px; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-dark); }
 .text-danger { color: var(--alert-red); font-weight: 600; text-decoration: none; font-size: 12px; }
+.text-danger:hover { text-decoration: underline; }
 
-/* --- 5. CUADRO DE CONFIRMACIÓN (DISEÑO EXACTO) --- */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-    display: none; 
-    justify-content: center; align-items: center;
-}
-
+/* --- 5. CUADRO DE CONFIRMACIÓN Y MODALES --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
 .modal-overlay:target { display: flex; }
+.modal-content { background: white; padding: 32px 24px; border-radius: 12px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; }
+.modal-header-alerta { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.modal-header-alerta h3 { font-size: 20px; font-weight: 700; color: var(--admin-text-dark); margin: 0; }
+.modal-content p { font-size: 14px; color: var(--admin-text-gray); margin-bottom: 32px; line-height: 1.6; padding: 0 16px; }
+.modal-buttons { display: flex; justify-content: center; gap: 16px; }
+.btn-modal { padding: 12px 0; border-radius: 6px; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; text-align: center; display: inline-block; transition: all 0.2s; }
+.btn-confirmar-eliminar { background: #b91c1c; color: white; }
+.btn-confirmar-eliminar:hover { background: #991b1b; transform: translateY(-2px); }
+.btn-cancelar { background: #f1f5f9; color: var(--admin-text-dark); width: 48%; box-sizing: border-box; }
+.btn-cancelar:hover { background: #e2e8f0; }
 
-.modal-content {
-    background: white;
-    padding: 32px 24px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+/* --- 6. ESTILOS DE DISPOSITIVOS --- */
+.botones-header { display: flex; gap: 12px; }
+.btn-outline-primary { border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; transition: background-color 0.2s; }
+.btn-outline-primary:hover { background-color: #f1f5f9; }
+
+.dispositivos-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 32px; 
+    padding: 0 32px 32px 32px; /* Esto empuja todo hacia adentro para que no toque los bordes */
 }
 
-.modal-header-alerta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
+.dispositivo-col .seccion-titulo {
+    display: block;
     margin-bottom: 16px;
+    color: var(--admin-primary);
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 8px;
+    font-size: 11px !important;
 }
 
-.modal-header-alerta h3 {
-    font-size: 20px;
+.dispositivo-item {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dispositivo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    border-color: #cbd5e1;
+}
+
+.disp-info h4 {
+    font-size: 15px;
     font-weight: 700;
     color: var(--admin-text-dark);
-    margin: 0;
+    margin-bottom: 6px;
 }
 
-.modal-content p {
-    font-size: 14px;
+.disp-info p {
+    font-size: 12px;
     color: var(--admin-text-gray);
-    margin-bottom: 32px;
-    line-height: 1.5;
-    padding: 0 16px;
 }
 
-.modal-buttons {
+.disp-status {
     display: flex;
-    justify-content: center;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
 }
 
-.btn-modal {
-    padding: 12px 0;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    text-align: center;
-    display: inline-block;
+.dot-activo { 
+    background: #10b981; 
+    width: 8px; 
+    height: 8px; 
+    border-radius: 50%; 
 }
-
-.btn-confirmar-eliminar {
-    background: #b91c1c; 
-    color: white;
-}
-
-.btn-confirmar-eliminar:hover { background: #991b1b; }
-
-.btn-cancelar {
-    background: #f1f5f9;
-    color: var(--admin-text-dark);
-    width: 48%;
-    box-sizing: border-box;
-}
-
-.btn-cancelar:hover { background: #e2e8f0; }

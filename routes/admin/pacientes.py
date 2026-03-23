@@ -122,7 +122,7 @@ def perfil_paciente(id):
 
     doctores = paciente.doctores
     
-    # LA CORRECCIÓN: Ordenamos explícitamente por el ID del familiar para siempre agarrar al principal
+    # LA CORRECCIÓN: Ordenamos para cargar siempre a Maria (el primer familiar)
     relaciones_fam = PacienteFamiliar.query.filter_by(id_paciente=id).order_by(PacienteFamiliar.id_familiar.asc()).all()
     familiares = []
     familiar_actual = None
@@ -162,7 +162,10 @@ def perfil_paciente(id):
 
     doctores_disponibles = Doctor.query.all()
     enfermedades_disponibles = Enfermedad.query.all()
-    subtipos_actuales = SubtipoEnfermedad.query.filter_by(id_enfermedad=paciente_enf.id_enfermedad).all() if paciente_enf else []
+    
+    # LA CORRECCIÓN 2 (Cero JS): Enviamos TODOS los subtipos de la base de datos
+    subtipos_actuales = SubtipoEnfermedad.query.all()
+    
     usuario_paciente = Usuario.query.get(paciente.id_usuario)
     
     gps_ocupados = [a.id_gps for a in AsignacionGPS.query.filter(AsignacionGPS.fecha_retiro.is_(None)).all() if a.id_gps != current_gps]
@@ -225,7 +228,7 @@ def editar_paciente(id):
         elif nuevo_id_enf:
             db.session.add(PacienteEnfermedad(id_paciente=id, id_enfermedad=nuevo_id_enf, id_subtipo=nuevo_id_sub, fecha_diagnostico=date.today()))
 
-        # LA CORRECCIÓN 2: También ordenamos aquí para editar al correcto
+        # LA CORRECCIÓN: Ordenamos explícitamente para actualizar a Maria y no a Jose.
         rel_fam = PacienteFamiliar.query.filter_by(id_paciente=id).order_by(PacienteFamiliar.id_familiar.asc()).first()
         email_fam_val = request.form.get('email_fam', '').strip()
         fam_email = email_fam_val if email_fam_val else None
