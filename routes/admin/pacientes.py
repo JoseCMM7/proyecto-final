@@ -339,3 +339,54 @@ def quitar_doctor(id_paciente, id_doctor):
         flash(f'Error al quitar doctor: {str(e)}', 'error')
         
     return redirect(url_for('admin.perfil_paciente', id=id_paciente))
+
+# --- NUEVAS RUTAS DE FAMILIARES ---
+@admin_bp.route('/paciente/<int:id>/agregar_familiar', methods=['POST'])
+def agregar_familiar(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    email_fam_val = request.form.get('email_fam', '').strip()
+    fam_email = email_fam_val if email_fam_val else None
+    
+    try:
+        # Verificamos si el familiar ya existe por su correo
+        existente = Familiar.query.filter_by(email=fam_email).first() if fam_email else None
+        
+        if existente:
+            # Si ya existe, solo lo vinculamos a este paciente
+            db.session.add(PacienteFamiliar(id_paciente=id, id_familiar=existente.id, relacion=request.form.get('relacion_fam'), fecha_creacion_cuenta=date.today()))
+        else:
+            # Si no existe, creamos el registro nuevo
+            nuevo_fam = Familiar(
+                nombre=request.form.get('nombre_fam'), 
+                apellido=request.form.get('apellido_fam'), 
+                email=fam_email, 
+                numero=request.form.get('telefono_fam')
+            )
+            db.session.add(nuevo_fam)
+            db.session.flush()
+            db.session.add(PacienteFamiliar(id_paciente=id, id_familiar=nuevo_fam.id, relacion=request.form.get('relacion_fam'), fecha_creacion_cuenta=date.today()))
+            
+        db.session.commit()
+        flash('Familiar agregado exitosamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al agregar familiar: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.perfil_paciente', id=id))
+
+@admin_bp.route('/paciente/<int:id_paciente>/quitar_familiar/<int:id_familiar>', methods=['POST'])
+def quitar_familiar(id_paciente, id_familiar):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    try:
+        relacion = PacienteFamiliar.query.filter_by(id_paciente=id_paciente, id_familiar=id_familiar).first()
+        if relacion:
+            db.session.delete(relacion)
+            db.session.commit()
+            flash('El familiar ha sido removido del expediente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al quitar familiar: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.perfil_paciente', id=id_paciente))
