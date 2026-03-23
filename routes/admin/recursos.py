@@ -43,33 +43,28 @@ def recursos():
 @admin_bp.route('/recursos/alta', methods=['POST'])
 def alta_recurso():
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
-
     tipo = request.form.get('tipo_dispositivo')
     nombre = request.form.get('nombre')
-
     try:
         if tipo == 'gps':
-            nuevo_gps = DispositivoGPS(nombre=nombre, freq_gps=request.form.get('freq_gps'), fecha_registro_gps=date.today())
-            db.session.add(nuevo_gps)
+            nuevo = DispositivoGPS(nombre=nombre, freq_gps=request.form.get('freq_gps'), fecha_registro_gps=date.today())
+            db.session.add(nuevo)
         elif tipo == 'beacon':
-            nuevo_beacon = DispositivoBeacon(nombre=nombre, tx_power=request.form.get('tx_power'), intervalo_adv=request.form.get('intervalo_adv'), fecha_registro_beacon=date.today())
-            db.session.add(nuevo_beacon)
+            nuevo = DispositivoBeacon(nombre=nombre, tx_power=request.form.get('tx_power'), intervalo_adv=request.form.get('intervalo_adv'), fecha_registro_beacon=date.today())
+            db.session.add(nuevo)
         elif tipo == 'nfc':
-            nuevo_nfc = DispositivoNFC(nombre=nombre, codigo_nfc=request.form.get('codigo_nfc'), fecha_registro_nfc=date.today())
-            db.session.add(nuevo_nfc)
-
+            nuevo = DispositivoNFC(nombre=nombre, codigo_nfc=request.form.get('codigo_nfc'), fecha_registro_nfc=date.today())
+            db.session.add(nuevo)
         db.session.commit()
-        flash('Dispositivo registrado en el inventario correctamente', 'success')
+        flash('Dispositivo registrado correctamente', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al registrar el dispositivo: {str(e)}', 'error')
-
+        flash(f'Error al registrar: {str(e)}', 'error')
     return redirect(url_for('admin.recursos'))
 
 @admin_bp.route('/recurso/<tipo>/<int:id>')
 def perfil_recurso(tipo, id):
     if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
-
     disp_nombre = ""
     fecha_reg = None
     fecha_baja = None
@@ -79,19 +74,19 @@ def perfil_recurso(tipo, id):
     registros_logs = []
     total_logs = 0
 
-    # 1. Obtener datos según el tipo de dispositivo
     if tipo == 'beacon':
         d = DispositivoBeacon.query.get_or_404(id)
         disp_nombre, fecha_reg, fecha_baja = d.nombre, d.fecha_registro_beacon, d.fecha_baja_beacon
         configs = {'TX POWER': f"{d.tx_power}", 'INTERVALO DE LLAMADAS': f"{d.intervalo_adv}"}
         asig_db = AsignacionBeacon.query.filter_by(id_beacon=id).order_by(AsignacionBeacon.fecha_asignacion.desc()).all()
-        regs_db = RegistroBeacon.query.filter_by(id_beacon=id).order_by(RegistroBeacon.fecha_beacon_log.desc()).limit(10).all()
-        total_logs = RegistroBeacon.query.filter_by(id_beacon=id).count()
+        regs_db = RegistroBeacon.query.filter_by(id_beacon=id).order_by(RegistroBeacon.fecha_beacon_log.desc()).all()
+        total_logs = len(regs_db)
         for r in regs_db:
             registros_logs.append({
                 'fecha': r.fecha_beacon_log.strftime('%d/%m/%Y %H:%M'),
+                'fecha_raw': r.fecha_beacon_log.strftime('%Y-%m-%dT%H:%M:%S'),
                 'col1': f"{r.distancia_calculada_beacon} m" if r.distancia_calculada_beacon else "N/A",
-                'col2': "Detección de zona"
+                'col2': "12" # Dato estático para visualizar el diseño del wireframe
             })
 
     elif tipo == 'gps':
@@ -99,11 +94,12 @@ def perfil_recurso(tipo, id):
         disp_nombre, fecha_reg, fecha_baja = d.nombre, d.fecha_registro_gps, d.fecha_baja_gps
         configs = {'FRECUENCIA ACTUALIZACIÓN': f"{d.freq_gps}"}
         asig_db = AsignacionGPS.query.filter_by(id_gps=id).order_by(AsignacionGPS.fecha_asignacion.desc()).all()
-        regs_db = RegistroGPS.query.filter_by(id_gps=id).order_by(RegistroGPS.fecha_gps_log.desc()).limit(10).all()
-        total_logs = RegistroGPS.query.filter_by(id_gps=id).count()
+        regs_db = RegistroGPS.query.filter_by(id_gps=id).order_by(RegistroGPS.fecha_gps_log.desc()).all()
+        total_logs = len(regs_db)
         for r in regs_db:
             registros_logs.append({
                 'fecha': r.fecha_gps_log.strftime('%d/%m/%Y %H:%M'),
+                'fecha_raw': r.fecha_gps_log.strftime('%Y-%m-%dT%H:%M:%S'),
                 'col1': f"Lat: {r.latitud}, Lon: {r.longitud}",
                 'col2': f"Dist: {r.distancia_calculada_gps}m" if r.distancia_calculada_gps else "N/A"
             })
@@ -113,41 +109,33 @@ def perfil_recurso(tipo, id):
         disp_nombre, fecha_reg, fecha_baja = d.nombre, d.fecha_registro_nfc, d.fecha_baja_nfc
         configs = {'CÓDIGO NFC / UID': d.codigo_nfc}
         asig_db = AsignacionNFC.query.filter_by(id_nfc=id).order_by(AsignacionNFC.fecha_asignacion.desc()).all()
-        regs_db = RegistroNFC.query.filter_by(id_nfc=id).order_by(RegistroNFC.fecha_nfc_log.desc()).limit(10).all()
-        total_logs = RegistroNFC.query.filter_by(id_nfc=id).count()
+        regs_db = RegistroNFC.query.filter_by(id_nfc=id).order_by(RegistroNFC.fecha_nfc_log.desc()).all()
+        total_logs = len(regs_db)
         for r in regs_db:
             registros_logs.append({
                 'fecha': r.fecha_nfc_log.strftime('%d/%m/%Y %H:%M'),
+                'fecha_raw': r.fecha_nfc_log.strftime('%Y-%m-%dT%H:%M:%S'),
                 'col1': r.motivo_escaneo or "Lectura NFC",
                 'col2': f"Doctor ID: {r.id_doctor}"
             })
 
-    # 2. Procesar asignaciones a pacientes
     lista_asignaciones = []
     paciente_actual = "N/A"
     
     for a in asig_db:
         p = Paciente.query.get(a.id_paciente)
         if not p: continue
-        
-        # Si no tiene fecha de retiro, es el paciente actual asignado
         if not a.fecha_retiro: paciente_actual = f"{p.nombre} {p.apellido}"
-
         est = HistorialEstado.query.filter_by(id_paciente=p.id, fecha_fin=None).first()
-        enf_rel = PacienteEnfermedad.query.filter_by(id_paciente=p.id).first()
-        enf_nombre = Enfermedad.query.get(enf_rel.id_enfermedad).nombre if enf_rel else "Sin registro"
-
         lista_asignaciones.append({
             'nombre': f"{p.nombre} {p.apellido}",
             'estado': est.estado.lower() if est else 'verde',
-            'enfermedad': enf_nombre,
             'fecha_vinc': a.fecha_asignacion.strftime('%d/%m/%Y'),
             'activa': True if not a.fecha_retiro else False
         })
 
     datos_disp = {
-        'id': id,
-        'nombre': disp_nombre, 'tipo': tipo,
+        'id': id, 'nombre': disp_nombre, 'tipo': tipo,
         'fecha_reg': fecha_reg.strftime('%d/%m/%Y') if fecha_reg else 'N/A',
         'fecha_baja': fecha_baja.strftime('%d/%m/%Y') if fecha_baja else 'N/A',
         'configs': configs, 'paciente_actual': paciente_actual,
@@ -156,139 +144,90 @@ def perfil_recurso(tipo, id):
 
     return render_template('admin/perfil_recurso.html', disp=datos_disp, asignaciones=lista_asignaciones, logs=registros_logs)
 
-from flask import request, redirect, url_for, flash, session
-# Asegúrate de tener importado 'db' y tus modelos de dispositivos aquí arriba
-
 @admin_bp.route('/recurso/<tipo>/<int:id>/editar', methods=['POST'])
 def editar_recurso(tipo, id):
-    if session.get('rol') != 'admin': 
-        return redirect(url_for('auth.login'))
-
-    # Obtenemos el nuevo nombre que aplica para todos los dispositivos
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     nuevo_nombre = request.form.get('nombre')
-
     try:
-        # Actualizamos dependiendo del tipo de dispositivo
         if tipo == 'gps':
-            dispositivo = DispositivoGPS.query.get_or_404(id)
-            dispositivo.nombre = nuevo_nombre
-            dispositivo.freq_gps = request.form.get('freq_gps')
-            
+            d = DispositivoGPS.query.get_or_404(id)
+            d.nombre = nuevo_nombre
+            d.freq_gps = request.form.get('freq_gps')
         elif tipo == 'beacon':
-            dispositivo = DispositivoBeacon.query.get_or_404(id)
-            dispositivo.nombre = nuevo_nombre
-            dispositivo.tx_power = request.form.get('tx_power')
-            dispositivo.intervalo_adv = request.form.get('intervalo_adv')
-            
+            d = DispositivoBeacon.query.get_or_404(id)
+            d.nombre = nuevo_nombre
+            d.tx_power = request.form.get('tx_power')
+            d.intervalo_adv = request.form.get('intervalo_adv')
         elif tipo == 'nfc':
-            dispositivo = DispositivoNFC.query.get_or_404(id)
-            dispositivo.nombre = nuevo_nombre
-            dispositivo.codigo_nfc = request.form.get('codigo_nfc')
-
-        # Guardamos los cambios permanentemente en la base de datos
+            d = DispositivoNFC.query.get_or_404(id)
+            d.nombre = nuevo_nombre
+            d.codigo_nfc = request.form.get('codigo_nfc')
         db.session.commit()
-        flash(f'Dispositivo {tipo.upper()} actualizado correctamente.', 'success')
-        
+        flash(f'Dispositivo {tipo.upper()} actualizado.', 'success')
     except Exception as e:
-        # Si hay un error (por ejemplo, un código NFC duplicado), deshacemos la transacción
         db.session.rollback()
-        flash(f'Error al actualizar el dispositivo: {str(e)}', 'error')
-
-    # Recargamos la misma página del perfil para ver los cambios reflejados
+        flash(f'Error al actualizar: {str(e)}', 'error')
     return redirect(url_for('admin.perfil_recurso', tipo=tipo, id=id))
-
 
 @admin_bp.route('/recurso/<tipo>/<int:id>/eliminar', methods=['POST'])
 def eliminar_recurso(tipo, id):
-    if session.get('rol') != 'admin': 
-        return redirect(url_for('auth.login'))
-
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     try:
         if tipo == 'gps':
-            dispositivo = DispositivoGPS.query.get_or_404(id)
+            d = DispositivoGPS.query.get_or_404(id)
             RegistroGPS.query.filter_by(id_gps=id).delete()
             AsignacionGPS.query.filter_by(id_gps=id).delete()
-            db.session.delete(dispositivo)
-            
+            db.session.delete(d)
         elif tipo == 'beacon':
-            dispositivo = DispositivoBeacon.query.get_or_404(id)
-            # Limpiamos dependencias del Beacon
+            d = DispositivoBeacon.query.get_or_404(id)
             RegistroBeacon.query.filter_by(id_beacon=id).delete()
             AsignacionBeacon.query.filter_by(id_beacon=id).delete()
-            db.session.delete(dispositivo)
-            
+            db.session.delete(d)
         elif tipo == 'nfc':
-            dispositivo = DispositivoNFC.query.get_or_404(id)
-            # Limpiamos dependencias del NFC para evitar error de Llave Foránea
+            d = DispositivoNFC.query.get_or_404(id)
             RegistroNFC.query.filter_by(id_nfc=id).delete()
             AsignacionNFC.query.filter_by(id_nfc=id).delete()
-            db.session.delete(dispositivo)
-
-        # Confirmamos la eliminación en la base de datos
+            db.session.delete(d)
         db.session.commit()
-        flash(f'Dispositivo {tipo.upper()} y todo su historial han sido eliminados permanentemente.', 'success')
-
+        flash('Dispositivo eliminado permanentemente.', 'success')
     except Exception as e:
-        db.session.rollback() 
-        flash(f'Error al eliminar el dispositivo: {str(e)}', 'error')
-
-    # Redirigimos al inventario general
+        db.session.rollback()
+        flash(f'Error al eliminar: {str(e)}', 'error')
     return redirect(url_for('admin.recursos'))
 
 @admin_bp.route('/recurso/<tipo>/<int:id>/baja', methods=['POST'])
 def baja_recurso(tipo, id):
-    if session.get('rol') != 'admin': 
-        return redirect(url_for('auth.login'))
-
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     try:
         hoy = date.today()
-        ahora = datetime.now() # Agregamos la hora exacta
-        
+        ahora = datetime.now()
         if tipo == 'gps':
-            dispositivo = DispositivoGPS.query.get_or_404(id)
-            dispositivo.estado_gps = 'Inactivo'
-            dispositivo.fecha_baja_gps = hoy
-            
-            asignaciones_activas = AsignacionGPS.query.filter_by(id_gps=id, fecha_retiro=None).all()
-            for asig in asignaciones_activas:
-                asig.fecha_retiro = ahora # Usamos 'ahora' (DateTime)
-                
+            d = DispositivoGPS.query.get_or_404(id)
+            d.estado_gps = 'Inactivo'
+            d.fecha_baja_gps = hoy
+            for asig in AsignacionGPS.query.filter_by(id_gps=id, fecha_retiro=None).all(): asig.fecha_retiro = ahora
         elif tipo == 'beacon':
-            dispositivo = DispositivoBeacon.query.get_or_404(id)
-            dispositivo.estado_beacon = 'Inactivo'
-            dispositivo.fecha_baja_beacon = hoy
-            
-            asignaciones_activas = AsignacionBeacon.query.filter_by(id_beacon=id, fecha_retiro=None).all()
-            for asig in asignaciones_activas:
-                asig.fecha_retiro = ahora # Usamos 'ahora' (DateTime)
-                
+            d = DispositivoBeacon.query.get_or_404(id)
+            d.estado_beacon = 'Inactivo'
+            d.fecha_baja_beacon = hoy
+            for asig in AsignacionBeacon.query.filter_by(id_beacon=id, fecha_retiro=None).all(): asig.fecha_retiro = ahora
         elif tipo == 'nfc':
-            dispositivo = DispositivoNFC.query.get_or_404(id)
-            dispositivo.estado_nfc = 'Inactivo'
-            dispositivo.fecha_baja_nfc = hoy
-            
-            asignaciones_activas = AsignacionNFC.query.filter_by(id_nfc=id, fecha_retiro=None).all()
-            for asig in asignaciones_activas:
-                asig.fecha_retiro = hoy # NFC usa Date normal, se queda con 'hoy'
-
+            d = DispositivoNFC.query.get_or_404(id)
+            d.estado_nfc = 'Inactivo'
+            d.fecha_baja_nfc = hoy
+            for asig in AsignacionNFC.query.filter_by(id_nfc=id, fecha_retiro=None).all(): asig.fecha_retiro = hoy
         db.session.commit()
-        flash(f'El dispositivo {tipo.upper()} ha sido dado de baja y desvinculado.', 'success')
-        
+        flash('Dispositivo dado de baja.', 'success')
     except Exception as e:
         db.session.rollback()
         flash(f'Error al dar de baja: {str(e)}', 'error')
-
     return redirect(url_for('admin.perfil_recurso', tipo=tipo, id=id))
 
 @admin_bp.route('/recurso/<tipo>/<int:id>/pacientes')
 def pacientes_recurso(tipo, id):
-    if session.get('rol') != 'admin': 
-        return redirect(url_for('auth.login'))
-
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
     disp_nombre = ""
     asignaciones_db = []
-
-    # 1. Buscamos el dispositivo y su historial de asignaciones dependiendo del tipo
     if tipo == 'gps':
         d = DispositivoGPS.query.get_or_404(id)
         disp_nombre = d.nombre
@@ -303,9 +242,7 @@ def pacientes_recurso(tipo, id):
         asignaciones_db = AsignacionNFC.query.filter_by(id_nfc=id).order_by(AsignacionNFC.fecha_asignacion.desc()).all()
 
     lista_pacientes = []
-    pacientes_agregados = set() # Evitamos mostrar al mismo paciente 2 veces si se le reasignó el mismo aparato
-
-    # 2. Recorremos el historial y armamos las tarjetas
+    pacientes_agregados = set()
     for a in asignaciones_db:
         if a.id_paciente not in pacientes_agregados:
             p = Paciente.query.get(a.id_paciente)
@@ -322,5 +259,4 @@ def pacientes_recurso(tipo, id):
                 pacientes_agregados.add(p.id)
 
     datos_disp = {'id': id, 'tipo': tipo, 'nombre': disp_nombre}
-    
     return render_template('admin/pacientes_recurso.html', disp=datos_disp, pacientes=lista_pacientes)
