@@ -25,7 +25,7 @@
                 <p>ADMIN PORTAL</p>
             </div>
 
-                        <div class="sidebar-menu">
+            <div class="sidebar-menu">
                 <a href="{{ url_for('admin.home') }}" class="menu-item {% if request.endpoint == 'admin.home' %}active{% endif %}">
                     <i class="fas fa-home"></i> Home
                 </a>
@@ -54,6 +54,18 @@
 
         <main class="main-content">
             <div class="content-wrapper">
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div style="padding: 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 600; font-size: 14px; {% if category == 'error' %}background-color: #fee2e2; color: #b91c1c; border: 1px solid #f87171;{% else %}background-color: #d1fae5; color: #047857; border: 1px solid #34d399;{% endif %}">
+                        <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}" style="margin-right: 8px;"></i>
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
                 {% block content %}
                 {% endblock %}
             </div>

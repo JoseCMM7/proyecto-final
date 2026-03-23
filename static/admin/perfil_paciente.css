@@ -1,61 +1,29 @@
-/* Breadcrumb & Header */
-.breadcrumb { font-size: 12px; color: var(--admin-text-gray); margin-bottom: 24px; }
-.breadcrumb a { color: var(--admin-text-gray); text-decoration: none; }
-.breadcrumb span { color: var(--admin-text-dark); font-weight: 600; }
+/* static/admin/perfil_paciente.css */
 
-.perfil-header { position: relative; margin-bottom: 32px; }
-.titulo-estado { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
-.titulo-estado h1 { font-size: 32px; font-weight: 700; color: var(--admin-text-dark); }
-.subtitulo { font-size: 14px; color: var(--admin-text-gray); }
-.btn-opciones { position: absolute; right: 0; top: 0; background: none; border: none; font-size: 20px; color: var(--admin-text-dark); cursor: pointer; }
-
-/* Badges */
+/* --- BADGES Y RESUMEN --- */
 .badge-estado { padding: 4px 12px; border-radius: 100px; font-size: 10px; font-weight: 700; }
 .badge-estado.rojo { background-color: #fee2e2; color: #b91c1c; }
 .badge-estado.amarillo { background-color: #fef9c3; color: #ca8a04; }
 .badge-estado.verde { background-color: #d1fae5; color: #047857; }
 
-.seccion-titulo { font-size: 11px; font-weight: 700; color: var(--admin-text-gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
-
-/* Top Cards Grid */
-.top-cards-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; margin-bottom: 24px; }
-
-.card-blanca { background: #fff; border-radius: 12px; padding: 32px; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); }
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.dato-box label { display: block; font-size: 11px; color: var(--admin-text-gray); margin-bottom: 4px; }
-.dato-box p { font-size: 14px; font-weight: 600; color: var(--admin-text-dark); }
-
-.card-azul { background: #1e3a8a; border-radius: 12px; padding: 32px; color: white; box-shadow: 0 10px 25px rgba(30,58,138,0.3); display: flex; flex-direction: column; justify-content: space-between;}
-.seccion-titulo-azul { font-size: 11px; font-weight: 700; color: #93c5fd; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
 .resumen-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
 .dato-principal h2 { font-size: 24px; font-weight: 700; margin-top: 4px; }
 .dato-secundario h2 { font-size: 24px; font-weight: 700; margin-top: 4px; text-align: right; }
-.actividad-box { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 16px; }
-.actividad-box label { font-size: 11px; color: #93c5fd; }
 .metros { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
 .metros h2 { font-size: 28px; font-weight: 700; }
 .metros span { font-size: 14px; opacity: 0.8; }
 
-/* Card Listas (Tablas) */
-.card-lista { background: #fff; border-radius: 12px; padding: 32px; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); margin-bottom: 24px; }
-.card-lista-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.btn-text-primary { color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; }
-.tabla-limpia { width: 100%; border-collapse: collapse; }
-.tabla-limpia th { text-align: left; padding: 12px 16px; font-size: 11px; color: var(--admin-text-gray); border-bottom: 1px solid var(--admin-border); font-weight: 600; }
-.tabla-limpia td { padding: 16px; font-size: 13px; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-dark); }
-.text-danger { color: var(--alert-red); font-weight: 600; text-decoration: none; font-size: 12px; }
-
-/* Dispositivos */
+/* --- DISPOSITIVOS --- */
 .botones-header { display: flex; gap: 12px; }
 .btn-outline-primary { border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; }
-.dispositivos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.dispositivos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .dispositivo-item { background: #f8fafc; padding: 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border: 1px solid var(--admin-border); }
 .disp-info h4 { font-size: 14px; font-weight: 600; color: var(--admin-text-dark); margin-bottom: 4px; }
 .disp-info p { font-size: 11px; color: var(--admin-text-gray); }
 .disp-status { display: flex; align-items: center; gap: 16px; }
 .dot-activo { background: #10b981; width: 8px; height: 8px; border-radius: 50%; }
 
-/* Tratamientos */
+/* --- TRATAMIENTOS --- */
 .card-tratamiento { background: #fff; border-radius: 12px; padding: 32px; border: 1px solid var(--admin-border); margin-bottom: 16px; }
 .trat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .trat-header h4 { font-size: 18px; font-weight: 700; color: var(--admin-text-dark); }
@@ -66,78 +34,17 @@
 .metrica label { display: block; font-size: 10px; font-weight: 700; color: var(--admin-text-gray); margin-bottom: 6px; }
 .metrica p { font-size: 14px; font-weight: 600; color: var(--admin-text-dark); }
 
-/* Modificamos la grid para soportar los 3 dispositivos (Beacon, GPS, NFC) */
-.dispositivos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-
-/* --- SECCIÓN ESTADÍSTICAS --- */
-.stats-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr; /* 60% izquierda, 40% derecha */
-    gap: 24px;
-    margin-top: 32px;
-}
-
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-}
-
-.stat-legend {
-    font-size: 11px;
-    color: var(--admin-text-gray);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dot-legend {
-    width: 8px;
-    height: 8px;
-    background-color: var(--admin-primary);
-    border-radius: 50%;
-}
-
-.chart-container {
-    width: 100%;
-    margin-top: 20px;
-}
-
-.chart-x-axis {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    font-size: 10px;
-    font-weight: 700;
-    color: #cbd5e1;
-    text-transform: uppercase;
-}
+/* --- ESTADÍSTICAS --- */
+.stats-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 32px; }
+.stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.stat-legend { font-size: 11px; color: var(--admin-text-gray); display: flex; align-items: center; gap: 8px; }
+.dot-legend { width: 8px; height: 8px; background-color: var(--admin-primary); border-radius: 50%; }
+.chart-container { width: 100%; margin-top: 20px; }
+.chart-x-axis { display: flex; justify-content: space-between; margin-top: 16px; font-size: 10px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; }
 
 /* Gráfica de Barras en CSS puro */
-.bar-chart-css {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    height: 150px;
-    margin-top: 32px;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--admin-border);
-}
-
-.bar {
-    width: 32px;
-    border-radius: 4px 4px 0 0;
-    transition: height 0.5s ease-in-out;
-}
-
+.bar-chart-css { display: flex; align-items: flex-end; justify-content: space-around; height: 150px; margin-top: 32px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--admin-border); }
+.bar { width: 32px; border-radius: 4px 4px 0 0; transition: height 0.5s ease-in-out; }
 .bar-gray { background-color: #e2e8f0; }
 .bar-blue { background-color: var(--admin-primary); }
-
-.stat-insight {
-    font-size: 12px;
-    color: var(--admin-text-gray);
-    line-height: 1.6;
-    font-style: italic;
-}
+.stat-insight { font-size: 12px; color: var(--admin-text-gray); line-height: 1.6; font-style: italic; }

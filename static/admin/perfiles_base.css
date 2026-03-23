@@ -82,7 +82,23 @@
 
 /* --- 4. CARD LISTAS (TABLAS) --- */
 .card-lista { background: #fff; border-radius: 12px; padding: 0; border: 1px solid var(--admin-border); box-shadow: var(--card-shadow); margin-bottom: 24px; overflow: hidden; }
-.card-lista-header { padding: 32px 32px 16px 32px; }
+.card-lista-header { 
+    padding: 32px 32px 16px 32px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+.btn-text-primary { 
+    color: var(--admin-primary); 
+    font-size: 13px; 
+    font-weight: 600; 
+    text-decoration: none; 
+}
+
+.btn-text-primary:hover {
+    text-decoration: underline;
+}
 .tabla-limpia { width: 100%; border-collapse: collapse; }
 .tabla-limpia th { text-align: left; padding: 16px 32px; font-size: 11px; color: var(--admin-text-gray); border-bottom: 1px solid var(--admin-border); font-weight: 600; }
 .tabla-limpia td { padding: 16px 32px; font-size: 13px; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-dark); }
