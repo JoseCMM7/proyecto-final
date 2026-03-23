@@ -226,3 +226,26 @@ def quitar_paciente_de_doctor(id_doctor, id_paciente):
         flash(f'Error al quitar paciente: {str(e)}', 'error')
         
     return redirect(url_for('admin.perfil_doctor', id=id_doctor))
+
+@admin_bp.route('/doctor/<int:id>/pacientes')
+def pacientes_doctor(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    doctor = Doctor.query.get_or_404(id)
+    # Obtenemos solo los pacientes de ESTE doctor
+    pacientes_asignados = doctor.pacientes.all()
+    
+    lista_pacientes = []
+    for p in pacientes_asignados:
+        # Buscamos el estado actual (rojo, amarillo o verde) para pintar la bolita
+        est = HistorialEstado.query.filter_by(id_paciente=p.id, fecha_fin=None).first()
+        
+        lista_pacientes.append({
+            'id': p.id,
+            'nombre': f"{p.nombre} {p.apellido}",
+            'fecha_ingreso': p.fecha_ingreso.strftime('%d/%m/%Y'),
+            'estado': est.estado.lower() if est else 'verde',
+            'fecha_raw': p.fecha_ingreso.strftime('%Y-%m-%d') if p.fecha_ingreso else "1970-01-01"
+        })
+        
+    return render_template('admin/pacientes_doctor.html', doctor=doctor, pacientes=lista_pacientes)
