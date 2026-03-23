@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthNode - {% block title %}Doctor{% endblock %}</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/base.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i class="fas fa-stethoscope"></i>
+                    <h1>HealthNode</h1>
+                </div>
+                <p>PORTAL MÉDICO</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="{{ url_for('doctor.home') }}" class="menu-item {% if request.endpoint == 'doctor.home' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-user-injured"></i> Mis Pacientes
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="admin-profile" style="font-weight: 700; color: var(--admin-primary); font-size: 16px;">
+                    Dr. {{ doctor.nombre }} {{ doctor.apellido }}
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="menu-item logout-link" style="padding-left: 0; margin-top: 8px;">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
