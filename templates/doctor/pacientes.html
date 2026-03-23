@@ -14,16 +14,16 @@
 
     <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px; color: var(--admin-text-dark);">Pacientes del Dr. {{ doctor.nombre }}</h2>
 
-    <form method="GET" action="{{ url_for('doctor.pacientes') }}" class="toolbar-form">
+   <form method="GET" action="{{ url_for('doctor.pacientes') }}" class="toolbar-form">
         <div class="search-box" style="margin: 0; flex: 1; max-width: 300px;">
             <i class="fas fa-search"></i>
-            <input type="text" name="q" placeholder="Buscar pacientes..." value="{{ busqueda }}">
+            <input type="text" name="q" placeholder="Buscar pacientes..." value="{{ busqueda }}" onchange="this.form.submit()">
         </div>
         
         <div class="toolbar-filters">
             <div class="select-group">
                 <label>FILTRAR POR ESTADO:</label>
-                <select name="estado">
+                <select name="estado" onchange="this.form.submit()">
                     <option value="todos" {% if filtro_estado == 'todos' %}selected{% endif %}>Todos los estados</option>
                     <option value="rojo" {% if filtro_estado == 'rojo' %}selected{% endif %}>Estado Rojo</option>
                     <option value="amarillo" {% if filtro_estado == 'amarillo' %}selected{% endif %}>Estado Amarillo</option>
@@ -33,15 +33,14 @@
 
             <div class="select-group">
                 <label>ORDENAR POR:</label>
-                <select name="orden">
+                <select name="orden" onchange="this.form.submit()">
                     <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Nombre</option>
                     <option value="fecha_reciente" {% if orden == 'fecha_reciente' %}selected{% endif %}>Ingreso más reciente</option>
                     <option value="fecha_antigua" {% if orden == 'fecha_antigua' %}selected{% endif %}>Ingreso más antiguo</option>
                 </select>
             </div>
             
-            <button type="submit" class="btn-filtrar">Aplicar</button>
-        </div>
+            </div>
     </form>
 
     <div class="patients-simple-grid">
