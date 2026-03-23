@@ -1,0 +1,162 @@
+{% extends 'doctor/base_control.html' %}
+
+{% block title %}Expediente: {{ paciente.nombre }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfil_paciente.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('doctor.pacientes') }}">Mis Pacientes</a> / <span>{{ paciente.nombre }} {{ paciente.apellido }}</span>
+</div>
+
+<div class="perfil-header">
+    <div class="titulo-estado">
+        <h1>{{ paciente.nombre }} {{ paciente.apellido }}</h1>
+        <span class="badge-estado {{ estado | lower }}">ESTADO {{ estado }}</span>
+    </div>
+    <p class="subtitulo">Expediente Clínico Electrónico</p>
+    </div>
+
+<div class="top-cards-grid">
+    <div class="card-blanca">
+        <h3 class="seccion-titulo">INFORMACIÓN PERSONAL</h3>
+        <div class="info-grid">
+            <div class="dato-box"><label>Nombre</label><p>{{ paciente.nombre }} {{ paciente.apellido }}</p></div>
+            <div class="dato-box"><label>Fecha de nacimiento</label><p>{{ paciente.fecha_nacimiento.strftime('%d %b %Y') }}</p></div>
+            <div class="dato-box"><label>Teléfono</label><p>{{ paciente.telefono or 'No registrado' }}</p></div>
+            <div class="dato-box"><label>Email</label><p>{{ paciente.email or 'No registrado' }}</p></div>
+        </div>
+    </div>
+
+    <div class="card-azul">
+        <h3 class="seccion-titulo-azul">DIAGNÓSTICO PRINCIPAL</h3>
+        <div class="resumen-flex">
+            <div class="dato-principal">
+                <label>Enfermedad</label>
+                <h2>{{ enfermedad }}</h2>
+            </div>
+            <div class="dato-secundario">
+                <label>Grado / Subtipo</label>
+                <h2>{{ subtipo }}</h2>
+            </div>
+        </div>
+        <div class="actividad-box">
+            <label>Meta de actividad física</label>
+            <div class="metros">
+                <h2>{{ paciente.actividad_minima }}</h2> <span>metros diarios</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header">
+        <h3 class="seccion-titulo">CONTACTOS DE EMERGENCIA (FAMILIARES)</h3>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr><th>Nombre</th><th>Parentesco</th><th>Email</th><th>Teléfono</th></tr>
+        </thead>
+        <tbody>
+            {% for fam in familiares %}
+            <tr>
+                <td><strong>{{ fam.datos.nombre }} {{ fam.datos.apellido }}</strong></td>
+                <td>{{ fam.relacion }}</td>
+                <td>{{ fam.datos.email or 'N/A' }}</td>
+                <td>{{ fam.datos.numero or 'N/A' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">No hay contactos de emergencia registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card-lista">
+    <div class="card-lista-header">
+        <h3 class="seccion-titulo">DISPOSITIVOS DE MONITOREO ACTIVOS</h3>
+    </div>
+    <div class="dispositivos-grid">
+        <div class="dispositivo-col">
+            <label class="seccion-titulo" style="font-size: 10px;">BEACONS</label>
+            {% for beacon in beacons %}
+            <div class="dispositivo-item">
+                <div class="disp-info"><h4>{{ beacon.nombre }}</h4></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div></div>
+            </div>
+            {% else %}<p class="empty-text">Sin beacons.</p>{% endfor %}
+        </div>
+        <div class="dispositivo-col">
+            <label class="seccion-titulo" style="font-size: 10px;">GPS</label>
+            {% for g in gps %}
+            <div class="dispositivo-item">
+                <div class="disp-info"><h4>{{ g.nombre }}</h4></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div></div>
+            </div>
+            {% else %}<p class="empty-text">Sin GPS.</p>{% endfor %}
+        </div>
+        <div class="dispositivo-col">
+            <label class="seccion-titulo" style="font-size: 10px;">NFC (PULSERA)</label>
+            {% for n in nfc %}
+            <div class="dispositivo-item">
+                <div class="disp-info"><h4>{{ n.nombre }}</h4></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div></div>
+            </div>
+            {% else %}<p class="empty-text">Sin NFC.</p>{% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="seccion-tratamientos">
+    <h3 class="seccion-titulo">TRATAMIENTOS ACTIVOS</h3>
+    {% for trat in tratamientos %}
+    <div class="card-tratamiento">
+        <div class="trat-header">
+            <h4>{{ trat.nombre }}</h4>
+            <span class="badge-med">{{ trat.tipo|upper }}</span>
+        </div>
+        <p class="trat-desc">{{ trat.descripcion }}</p>
+        <p class="trat-doctor">Recetado por: {{ trat.doctor_nombre }}</p>
+        <div class="trat-metricas">
+            <div class="metrica"><label>DOSIS</label><p>{{ trat.dosis_valor }} {{ trat.dosis_unidad }}</p></div>
+            <div class="metrica"><label>FRECUENCIA</label><p>{{ trat.frecuencia_valor }} vez / {{ trat.frecuencia_unidad }}</p></div>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: var(--admin-text-gray);">El paciente no tiene tratamientos activos registrados.</p>
+    {% endfor %}
+</div>
+
+<div class="card-lista" style="margin-top: 32px;">
+    <div class="card-lista-header" style="padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+        <h3 class="seccion-titulo">HISTORIAL DE CONTROLES MÉDICOS</h3>
+        
+        <a href="#" style="color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--admin-primary); padding: 8px 16px; border-radius: 6px;">
+            + Registrar Control
+        </a>
+    </div>
+    <table class="tabla-limpia">
+        <thead>
+            <tr style="background-color: #f8fafc;">
+                <th>Fecha</th>
+                <th>Médico Evaluador</th>
+                <th>Notas Clínicas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in controles %}
+            <tr>
+                <td><strong>{{ c.fecha }}</strong></td>
+                <td>{{ c.doctor }}</td>
+                <td style="color: var(--admin-text-gray);">{{ c.notas }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No hay notas de evolución registradas aún.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

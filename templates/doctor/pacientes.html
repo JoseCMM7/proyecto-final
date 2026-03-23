@@ -45,7 +45,7 @@
 
     <div class="patients-simple-grid">
         {% for p in pacientes %}
-        <a href="#" class="patient-card-simple clickable-card">
+        <a href="{{ url_for('doctor.perfil_paciente', id=p.id) }}" class="patient-card-simple clickable-card">
             <div class="patient-card-info">
                 <h3 style="color: var(--admin-text-dark);">{{ p.nombre }}</h3>
                 <p style="color: var(--admin-text-gray);"><i class="far fa-calendar-alt"></i> Ingreso: {{ p.fecha_ingreso_str }}</p>
