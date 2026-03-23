@@ -102,7 +102,7 @@
                 </td>
                 <td>{{ p.enfermedad }}</td>
                 <td>{{ p.fecha_ingreso }}</td>
-                <td><a href="#" class="text-danger">Quitar</a></td>
+                <td><a href="#modalQuitarPaciente-{{ p.id }}" class="text-danger">Quitar</a></td>
             </tr>
             {% else %}
             <tr><td colspan="5">No tiene pacientes asignados.</td></tr>
@@ -188,4 +188,23 @@
         </form>
     </div>
 </div>
+
+{% for p in pacientes %}
+<div id="modalQuitarPaciente-{{ p.id }}" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
+            <h3>Desvincular paciente</h3>
+        </div>
+        <p>¿Estás seguro de que deseas quitar al paciente <strong>{{ p.nombre }}</strong> de la lista de este doctor?</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.quitar_paciente_de_doctor', id_doctor=doctor.id, id_paciente=p.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a> 
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 {% endblock %}

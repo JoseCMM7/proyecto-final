@@ -99,6 +99,7 @@ def perfil_doctor(id):
             enfermedad_nombre = enf.nombre if enf else "No registrada"
 
         lista_pacientes.append({
+            'id': p.id, 
             'nombre': f"{p.nombre} {p.apellido}",
             'estado': estado_actual,
             'enfermedad': enfermedad_nombre,
@@ -206,3 +207,22 @@ def eliminar_doctor(id):
         flash(f'Error al eliminar el doctor: {str(e)}', 'error')
 
     return redirect(url_for('admin.doctores'))
+
+@admin_bp.route('/doctor/<int:id_doctor>/quitar_paciente/<int:id_paciente>', methods=['POST'])
+def quitar_paciente_de_doctor(id_doctor, id_paciente):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    doctor = Doctor.query.get_or_404(id_doctor)
+    paciente = Paciente.query.get_or_404(id_paciente)
+    
+    try:
+        # Verificamos si la relación existe y la borramos
+        if paciente in doctor.pacientes:
+            doctor.pacientes.remove(paciente)
+            db.session.commit()
+            flash(f'El paciente {paciente.nombre} {paciente.apellido} ha sido removido del doctor.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al quitar paciente: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.perfil_doctor', id=id_doctor))
