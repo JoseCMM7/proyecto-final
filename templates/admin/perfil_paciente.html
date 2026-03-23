@@ -14,7 +14,11 @@
 
 <div class="perfil-header">
     <div class="titulo-estado">
-        <h1>{{ paciente.nombre }} {{ paciente.apellido }}</h1>
+        <h1>{{ paciente.nombre }} {{ paciente.apellido }}
+        {% if paciente.fecha_baja_paciente %}
+        <span style="font-size: 11px; font-weight: 800; background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; vertical-align: middle; margin-left: 12px; letter-spacing: 0.5px;">INACTIVO</span>
+        {% endif %}
+        </h1>
         <span class="badge-estado {{ estado | lower }}">ESTADO {{ estado }}</span>
     </div>
     <p class="subtitulo">Perfil del paciente</p>
@@ -25,7 +29,12 @@
             <a href="#modalEditarPaciente" class="dropdown-item">
                 <i class="fas fa-edit"></i> Editar datos
             </a>
-            <a href="#confirmar-eliminar" class="dropdown-item item-peligro">
+            
+            <a href="#modalDarBajaPaciente" class="dropdown-item" style="color: #ea580c;">
+                <i class="fas fa-power-off"></i> Dar de baja
+            </a>
+            
+            <a href="#confirmar-eliminar-paciente" class="dropdown-item item-peligro">
                 <i class="fas fa-trash-alt"></i> Eliminar paciente
             </a>
         </div>
@@ -34,7 +43,7 @@
 
 <div class="top-cards-grid">
     <div class="card-blanca">
-        <h3 class="seccion-titulo">INFORMACION PERSONAL</h3>
+        <h3 class="seccion-titulo">INFORMACIÓN PERSONAL</h3>
         <div class="info-grid">
             <div class="dato-box">
                 <label>Nombre</label>
@@ -45,7 +54,7 @@
                 <p>{{ paciente.fecha_nacimiento.strftime('%d %b %Y') }}</p>
             </div>
             <div class="dato-box">
-                <label>Telefono</label>
+                <label>Teléfono</label>
                 <p>{{ paciente.telefono or 'No registrado' }}</p>
             </div>
             <div class="dato-box">
@@ -56,11 +65,17 @@
                 <label>Fecha de ingreso</label>
                 <p>{{ paciente.fecha_ingreso.strftime('%d %b %Y') }}</p>
             </div>
+            {% if paciente.fecha_baja_paciente %}
+            <div class="dato-box">
+                <label style="color: #b91c1c;">Fecha de baja</label>
+                <p style="color: #b91c1c; font-weight: 600;">{{ paciente.fecha_baja_paciente.strftime('%d %b %Y') }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
     <div class="card-azul">
-        <h3 class="seccion-titulo-azul">RESUMEN CLINICO</h3>
+        <h3 class="seccion-titulo-azul">RESUMEN CLÍNICO</h3>
         <div class="resumen-flex">
             <div class="dato-principal">
                 <label>Enfermedad</label>
@@ -72,7 +87,7 @@
             </div>
         </div>
         <div class="actividad-box">
-            <label>Actividad minima diaria</label>
+            <label>Actividad mínima diaria</label>
             <div class="metros">
                 <h2>{{ paciente.actividad_minima }}</h2> <span>metros</span> <i class="fas fa-walking"></i>
             </div>
@@ -91,8 +106,8 @@
                 <th>Nombre</th>
                 <th>Especialidad</th>
                 <th>Email</th>
-                <th>Telefono</th>
-                <th>Accion</th>
+                <th>Teléfono</th>
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody>
@@ -120,10 +135,10 @@
         <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Relacion</th>
+                <th>Relación</th>
                 <th>Email</th>
-                <th>Telefono</th>
-                <th>Accion</th>
+                <th>Teléfono</th>
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody>
@@ -195,14 +210,14 @@
 
 <div class="card-lista">
     <div class="card-lista-header" style="padding-bottom: 0;">
-        <h3 class="seccion-titulo">CONTROLES MEDICOS</h3>
+        <h3 class="seccion-titulo">CONTROLES MÉDICOS</h3>
     </div>
     <table class="tabla-limpia">
         <thead>
             <tr style="background-color: #f8fafc;">
                 <th>Fecha del control</th>
                 <th>Doctor responsable</th>
-                <th>Notas medicas</th>
+                <th>Notas médicas</th>
             </tr>
         </thead>
         <tbody>
@@ -290,7 +305,7 @@
             <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
             <h3>Eliminar paciente</h3>
         </div>
-        <p>¿Estas seguro de que deseas eliminar este paciente? Esta accion no se puede deshacer y se borraran todos los registros asociados.</p>
+        <p>¿Estás seguro de que deseas eliminar este paciente? Esta acción no se puede deshacer y se borrarán todos los registros asociados.</p>
         <div class="modal-buttons">
             <form action="{{ url_for('admin.eliminar_paciente', id=paciente.id) }}" method="POST" style="margin:0; width:48%;">
                 <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Eliminar</button>
@@ -305,7 +320,7 @@
         <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
         <div class="modal-header" style="margin-bottom: 24px;">
             <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar nuevo doctor</h2>
-            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Seleccione el especialista que tendra acceso al expediente.</p>
+            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Seleccione el especialista que tendrá acceso al expediente.</p>
         </div>
         <form action="{{ url_for('admin.asignar_doctor', id=paciente.id) }}" method="POST">
             <div class="form-group">
@@ -332,10 +347,10 @@
             <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
             <h3>Quitar doctor</h3>
         </div>
-        <p>¿Estas seguro de que deseas quitar al <strong>Dr. {{ doc.nombre }} {{ doc.apellido }}</strong> de este paciente?</p>
+        <p>¿Estás seguro de que deseas quitar al <strong>Dr. {{ doc.nombre }} {{ doc.apellido }}</strong> de este paciente?</p>
         <div class="modal-buttons">
             <form action="{{ url_for('admin.quitar_doctor', id_paciente=paciente.id, id_doctor=doc.id) }}" method="POST" style="margin:0; width:48%;">
-                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button>
+                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button>
             </form>
             <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
         </div>
@@ -357,10 +372,10 @@
             </div>
             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                 <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Email</label><input type="email" name="email_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;"></div>
-                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Telefono</label><input type="text" name="telefono_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;"></div>
+                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Teléfono</label><input type="text" name="telefono_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;"></div>
             </div>
             <div class="form-group">
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Relacion</label>
+                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Relación</label>
                 <select name="relacion_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;" required>
                     <option value="">Seleccione parentesco</option>
                     <option value="Hijo/a">Hijo/a</option>
@@ -384,10 +399,10 @@
             <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
             <h3>Quitar familiar</h3>
         </div>
-        <p>¿Estas seguro de que deseas desvincular a <strong>{{ fam.datos.nombre }} {{ fam.datos.apellido }}</strong> de este paciente?</p>
+        <p>¿Estás seguro de que deseas desvincular a <strong>{{ fam.datos.nombre }} {{ fam.datos.apellido }}</strong> de este paciente?</p>
         <div class="modal-buttons">
             <form action="{{ url_for('admin.quitar_familiar', id_paciente=paciente.id, id_familiar=fam.datos.id) }}" method="POST" style="margin:0; width:48%;">
-                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button>
+                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button>
             </form>
             <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
         </div>
@@ -401,20 +416,20 @@
         
         <div class="modal-header" style="margin-bottom: 32px; text-align: left;">
             <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Editar datos del paciente</h2>
-            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Modifique la informacion y guarde los cambios.</p>
+            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Modifique la información y guarde los cambios.</p>
         </div>
 
         <form action="{{ url_for('admin.editar_paciente', id=paciente.id) }}" method="POST" style="text-align: left;">
             <div class="form-grid">
                 <div class="col-left">
-                    <div class="form-section-title">Informacion Personal</div>
+                    <div class="form-section-title">Información Personal</div>
                     <div class="form-row">
                         <div class="form-group"><label>Primer Nombre</label><input type="text" name="nombre" class="form-control" value="{{ paciente.nombre }}" required></div>
                         <div class="form-group"><label>Primer Apellido</label><input type="text" name="apellido" class="form-control" value="{{ paciente.apellido }}" required></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label>Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" class="form-control" value="{{ paciente.fecha_nacimiento.strftime('%Y-%m-%d') }}" required></div>
-                        <div class="form-group"><label>Telefono</label><input type="text" name="telefono" class="form-control" value="{{ paciente.telefono or '' }}"></div>
+                        <div class="form-group"><label>Teléfono</label><input type="text" name="telefono" class="form-control" value="{{ paciente.telefono or '' }}"></div>
                     </div>
                     <div class="form-group"><label>Email de contacto</label><input type="email" name="email" class="form-control" value="{{ paciente.email or '' }}"></div>
 
@@ -459,11 +474,11 @@
                 </div>
 
                 <div class="col-right">
-                    <div class="form-section-title">Informacion Clinica</div>
+                    <div class="form-section-title">Información Clínica</div>
                     <div class="form-group">
                         <label>Enfermedad Principal</label>
                         <select name="id_enfermedad" class="form-control" required>
-                            <option value="">Seleccione una patologia</option>
+                            <option value="">Seleccione una patología</option>
                             {% for enf in enfermedades_disponibles %}
                                 <option value="{{ enf.id }}" {% if paciente_enf and enf.id == paciente_enf.id_enfermedad %}selected{% endif %}>{{ enf.nombre }}</option>
                             {% endfor %}
@@ -480,7 +495,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group"><label>Actividad fisica minima recomendada (Pasos/Dia)</label><input type="number" name="actividad_minima" class="form-control" value="{{ paciente.actividad_minima }}"></div>
+                    <div class="form-group"><label>Actividad física mínima recomendada (Pasos/Día)</label><input type="number" name="actividad_minima" class="form-control" value="{{ paciente.actividad_minima }}"></div>
 
                     <div class="form-section-title" style="margin-top: 32px;">Familiar Responsable Principal</div>
                     <div class="box-section">
@@ -490,10 +505,10 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Email</label><input type="email" name="email_fam" class="form-control" value="{{ familiar_actual.email if familiar_actual else '' }}"></div>
-                            <div class="form-group"><label>Telefono</label><input type="text" name="telefono_fam" class="form-control" value="{{ familiar_actual.numero if familiar_actual else '' }}"></div>
+                            <div class="form-group"><label>Teléfono</label><input type="text" name="telefono_fam" class="form-control" value="{{ familiar_actual.numero if familiar_actual else '' }}"></div>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label>Relacion</label>
+                            <label>Relación</label>
                             <select name="relacion_fam" class="form-control">
                                 <option value="Hijo/a" {% if relacion_actual == 'Hijo/a' %}selected{% endif %}>Hijo/a</option>
                                 <option value="Esposo/a" {% if relacion_actual == 'Esposo/a' %}selected{% endif %}>Esposo/a</option>
@@ -577,7 +592,7 @@
         <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular Beacon</h3></div>
         <p>¿Seguro que deseas desvincular el beacon <strong>{{ beacon.nombre }}</strong>?</p>
         <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='beacon', id_disp=beacon.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button></form>
+            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='beacon', id_disp=beacon.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button></form>
             <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
         </div>
     </div>
@@ -590,7 +605,7 @@
         <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular GPS</h3></div>
         <p>¿Seguro que deseas desvincular el GPS <strong>{{ g.nombre }}</strong>?</p>
         <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='gps', id_disp=g.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button></form>
+            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='gps', id_disp=g.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button></form>
             <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
         </div>
     </div>
@@ -603,10 +618,27 @@
         <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular NFC</h3></div>
         <p>¿Seguro que deseas desvincular el dispositivo NFC <strong>{{ n.nombre }}</strong>?</p>
         <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='nfc', id_disp=n.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Si, quitar</button></form>
+            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='nfc', id_disp=n.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button></form>
             <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
         </div>
     </div>
 </div>
 {% endfor %}
+
+<div id="modalDarBajaPaciente" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-power-off" style="color: #ea580c; font-size: 20px;"></i>
+            <h3 style="color: #ea580c;">Dar de baja paciente</h3>
+        </div>
+        <p>¿Estás seguro de que deseas dar de baja a <strong>{{ paciente.nombre }}</strong>? Se le desvinculará de sus doctores, se liberarán sus dispositivos y ya no podrá acceder al sistema.</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.baja_paciente', id=paciente.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar" style="background-color: #ea580c; color: white; border:none; width: 100%;">Sí, dar de baja</button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

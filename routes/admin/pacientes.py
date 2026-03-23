@@ -428,3 +428,45 @@ def quitar_dispositivo(id_paciente, tipo, id_disp):
         flash(f'Error al quitar {tipo}: {str(e)}', 'error')
 
     return redirect(url_for('admin.perfil_paciente', id=id_paciente))
+
+@admin_bp.route('/paciente/<int:id>/baja', methods=['POST'])
+def baja_paciente(id):
+    if session.get('rol') != 'admin': 
+        return redirect(url_for('auth.login'))
+
+    try:
+        paciente = Paciente.query.get_or_404(id)
+        usuario = Usuario.query.get(paciente.id_usuario)
+        
+        hoy = date.today()
+        ahora = datetime.now()
+        
+        # 1. Registramos la baja en su perfil y desactivamos su usuario
+        paciente.fecha_baja_paciente = hoy
+        if usuario:
+            usuario.fecha_baja = hoy
+            
+        # 2. Lo desvinculamos de todos sus doctores
+        paciente.doctores = []
+
+        # 3. Cerramos su estado clínico actual en el historial
+        estado_actual = HistorialEstado.query.filter_by(id_paciente=id, fecha_fin=None).first()
+        if estado_actual:
+            estado_actual.fecha_fin = hoy
+
+        # 4. Le retiramos cualquier dispositivo activo para que regrese al inventario
+        for asig in AsignacionGPS.query.filter_by(id_paciente=id, fecha_retiro=None).all():
+            asig.fecha_retiro = ahora
+        for asig in AsignacionBeacon.query.filter_by(id_paciente=id, fecha_retiro=None).all():
+            asig.fecha_retiro = ahora
+        for asig in AsignacionNFC.query.filter_by(id_paciente=id, fecha_retiro=None).all():
+            asig.fecha_retiro = hoy
+
+        db.session.commit()
+        flash(f'El paciente {paciente.nombre} {paciente.apellido} ha sido dado de baja y desvinculado de todos los recursos.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al dar de baja al paciente: {str(e)}', 'error')
+
+    return redirect(url_for('admin.perfil_paciente', id=id))
