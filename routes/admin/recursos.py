@@ -161,37 +161,40 @@ from flask import request, redirect, url_for, flash, session
 
 @admin_bp.route('/recurso/<tipo>/<int:id>/editar', methods=['POST'])
 def editar_recurso(tipo, id):
-    # Protección de ruta
     if session.get('rol') != 'admin': 
         return redirect(url_for('auth.login'))
 
-    # 1. Recibimos los datos del formulario HTML
-    nombre = request.form.get('nombre')
+    # Obtenemos el nuevo nombre que aplica para todos los dispositivos
+    nuevo_nombre = request.form.get('nombre')
 
     try:
-        # 2. Lógica dependiendo del tipo de dispositivo
+        # Actualizamos dependiendo del tipo de dispositivo
         if tipo == 'gps':
-            frecuencia = request.form.get('freq_gps')
-            # Aquí va tu código SQLAlchemy: 
-            # dispositivo = DispositivoGPS.query.get_or_404(id)
-            # dispositivo.nombre = nombre
+            dispositivo = DispositivoGPS.query.get_or_404(id)
+            dispositivo.nombre = nuevo_nombre
+            dispositivo.freq_gps = request.form.get('freq_gps')
             
         elif tipo == 'beacon':
-            tx_power = request.form.get('tx_power')
-            intervalo = request.form.get('intervalo_adv')
-            # Lógica SQLAlchemy para Beacon
+            dispositivo = DispositivoBeacon.query.get_or_404(id)
+            dispositivo.nombre = nuevo_nombre
+            dispositivo.tx_power = request.form.get('tx_power')
+            dispositivo.intervalo_adv = request.form.get('intervalo_adv')
             
         elif tipo == 'nfc':
-            codigo = request.form.get('codigo_nfc')
-            # Lógica SQLAlchemy para NFC
+            dispositivo = DispositivoNFC.query.get_or_404(id)
+            dispositivo.nombre = nuevo_nombre
+            dispositivo.codigo_nfc = request.form.get('codigo_nfc')
 
-        # db.session.commit() # Descomenta esto cuando conectes tus modelos
+        # Guardamos los cambios permanentemente en la base de datos
+        db.session.commit()
         flash(f'Dispositivo {tipo.upper()} actualizado correctamente.', 'success')
         
     except Exception as e:
-        # db.session.rollback()
-        flash(f'Error al actualizar: {str(e)}', 'error')
+        # Si hay un error (por ejemplo, un código NFC duplicado), deshacemos la transacción
+        db.session.rollback()
+        flash(f'Error al actualizar el dispositivo: {str(e)}', 'error')
 
+    # Recargamos la misma página del perfil para ver los cambios reflejados
     return redirect(url_for('admin.perfil_recurso', tipo=tipo, id=id))
 
 
