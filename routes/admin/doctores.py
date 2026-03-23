@@ -3,9 +3,11 @@ from flask import render_template, session, redirect, url_for, request, flash
 from models import (
     db, Administrador, Doctor, Usuario, Especialidad, 
     Paciente, HistorialEstado, PacienteEnfermedad, 
-    Enfermedad, ControlMedico
+    Enfermedad, ControlMedico, PacienteTratamiento, RegistroIndicador,
+    Doctor
 )
 from . import admin_bp
+from sqlalchemy import text
 
 @admin_bp.route('/doctores')
 def doctores():
@@ -128,3 +130,79 @@ def perfil_doctor(id):
                            pacientes_activos=len(pacientes_asignados),
                            controles_mes=controles_mes_count,
                            controles=lista_controles)
+
+@admin_bp.route('/doctores/<int:id>/editar', methods=['POST'])
+def editar_doctor(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    doctor = Doctor.query.get_or_404(id)
+    try:
+        doctor.nombre = request.form.get('nombre')
+        doctor.apellido = request.form.get('apellido')
+        doctor.cedula = request.form.get('cedula')
+        doctor.telefono = request.form.get('telefono')
+        
+        db.session.commit()
+        flash('Datos del doctor actualizados exitosamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al actualizar: {str(e)}', 'error')
+
+    return redirect(url_for('admin.perfil_doctor', id=id))
+
+@admin_bp.route('/doctores/<int:id>/eliminar', methods=['POST'])
+def eliminar_doctor(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    doctor = Doctor.query.get_or_404(id)
+    id_usuario = doctor.id_usuario
+    
+    try:
+        # 1. Desvincular a todos los pacientes primero (esto arregla el error que te salió)
+        doctor.pacientes = []
+        
+        # 2. Limpiar Controles Médicos e Indicadores
+        controles = ControlMedico.query.filter_by(id_doctor=id).all()
+        for c in controles:
+            RegistroIndicador.query.filter_by(id_control=c.id).delete()
+            db.session.delete(c)
+            
+        # 3. Limpiar Tratamientos recetados por este doctor
+        PacienteTratamiento.query.filter_by(id_doctor=id).delete()
+
+        # 4. Limpiar Registros IoT de forma SEGURA usando "Puntos de Guardado"
+        # Si la tabla no existe o no tiene relación con el doctor, lo ignora sin bloquear el sistema.
+        try:
+            with db.session.begin_nested():
+                db.session.execute(text("DELETE FROM registros_nfc WHERE id_doctor = :doc_id"), {"doc_id": id})
+        except:
+            pass
+            
+        try:
+            with db.session.begin_nested():
+                db.session.execute(text("DELETE FROM registros_gps WHERE id_doctor = :doc_id"), {"doc_id": id})
+        except:
+            pass
+            
+        try:
+            with db.session.begin_nested():
+                db.session.execute(text("DELETE FROM registros_beacon WHERE id_doctor = :doc_id"), {"doc_id": id})
+        except:
+            pass
+
+        # 5. Borrar el perfil del doctor
+        db.session.delete(doctor)
+        
+        # 6. Borrar su cuenta de inicio de sesión
+        usuario = Usuario.query.get(id_usuario)
+        if usuario:
+            db.session.delete(usuario)
+            
+        db.session.commit()
+        flash('El doctor y todo su historial han sido eliminados del sistema.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al eliminar el doctor: {str(e)}', 'error')
+
+    return redirect(url_for('admin.doctores'))

@@ -1,10 +1,9 @@
 {% extends 'admin/base_admin.html' %}
 
-{% block title %}Perfil Dr. {{ doctor.nombre }} {{ doctor.apellido }}{% endblock %}
+{% block title %}Perfil de Dr. {{ doctor.nombre }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='admin/perfil_doctor.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -17,7 +16,18 @@
         <h1>Dr. {{ doctor.nombre }} {{ doctor.apellido }}</h1>
     </div>
     <p class="subtitulo">Perfil del doctor</p>
-    <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+    
+    <div class="menu-opciones" tabindex="0">
+        <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+        <div class="dropdown-content">
+            <a href="#modalEditarDoctor" class="dropdown-item">
+                <i class="fas fa-edit"></i> Editar datos
+            </a>
+            <a href="#confirmar-eliminar-doctor" class="dropdown-item item-peligro">
+                <i class="fas fa-trash-alt"></i> Eliminar doctor
+            </a>
+        </div>
+    </div>
 </div>
 
 <div class="top-cards-grid">
@@ -130,6 +140,52 @@
     </table>
     <div class="tabla-footer">
         <a href="#">VER TODOS LOS CONTROLES</a>
+    </div>
+</div>
+
+<div id="confirmar-eliminar-doctor" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
+            <h3>Eliminar doctor</h3>
+        </div>
+        <p>¿Estás seguro de que deseas eliminar a este doctor? Se perderá su acceso al sistema y se desvinculará de sus pacientes actuales.</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.eliminar_doctor', id=doctor.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Eliminar</button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditarDoctor">
+    <div class="modal-content" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 40px; position: relative;">
+        <a href="#" class="modal-close" style="text-decoration: none; position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); font-size: 20px;"><i class="fas fa-times"></i></a>
+        
+        <div class="modal-header" style="margin-bottom: 32px; text-align: left;">
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Editar datos del doctor</h2>
+            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Modifique la información y guarde los cambios.</p>
+        </div>
+
+        <form action="{{ url_for('admin.editar_doctor', id=doctor.id) }}" method="POST" style="text-align: left;">
+            <div class="form-section-title">Información Profesional</div>
+            <div class="box-section">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Nombre</label><input type="text" name="nombre" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ doctor.nombre }}" required></div>
+                    <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Apellido</label><input type="text" name="apellido" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ doctor.apellido }}" required></div>
+                </div>
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Cédula Profesional</label><input type="text" name="cedula" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ doctor.cedula }}" required></div>
+                    <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Teléfono</label><input type="text" name="telefono" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ doctor.telefono }}"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
+                <a href="#" class="btn-secondary" style="background: transparent; color: var(--admin-text-gray); border: none; padding: 12px 24px; font-weight: 600; text-decoration: none;">Descartar cambios</a>
+                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar Cambios</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
