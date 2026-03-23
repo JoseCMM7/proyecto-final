@@ -13,7 +13,11 @@
 
 <div class="perfil-header">
     <div class="titulo-estado">
-        <h1>Dr. {{ doctor.nombre }} {{ doctor.apellido }}</h1>
+        <h1>Dr. {{ doctor.nombre }} {{ doctor.apellido }}
+        {% if doctor.fecha_baja_doctor %}
+        <span style="font-size: 11px; font-weight: 800; background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; vertical-align: middle; margin-left: 12px; letter-spacing: 0.5px;">INACTIVO</span>
+        {% endif %}
+    </h1>
     </div>
     <p class="subtitulo">Perfil del doctor</p>
     
@@ -22,6 +26,9 @@
         <div class="dropdown-content">
             <a href="#modalEditarDoctor" class="dropdown-item">
                 <i class="fas fa-edit"></i> Editar datos
+            </a>
+            <a href="#modalDarBajaDoctor" class="dropdown-item" style="color: #ea580c;">
+                <i class="fas fa-power-off"></i> Dar de baja
             </a>
             <a href="#confirmar-eliminar-doctor" class="dropdown-item item-peligro">
                 <i class="fas fa-trash-alt"></i> Eliminar doctor
@@ -58,6 +65,13 @@
                 <label>Teléfono</label>
                 <p>{{ doctor.telefono or 'No registrado' }}</p>
             </div>
+
+            {% if doctor.fecha_baja_doctor %}
+            <div class="info-group">
+                <label>FECHA DE BAJA</label>
+                <p style="color: #b91c1c; font-weight: 600;">{{ doctor.fecha_baja_doctor.strftime('%d/%m/%Y') }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -206,5 +220,21 @@
     </div>
 </div>
 {% endfor %}
+
+<div id="modalDarBajaDoctor" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-power-off" style="color: #ea580c; font-size: 20px;"></i>
+            <h3 style="color: #ea580c;">Dar de baja doctor</h3>
+        </div>
+        <p>¿Estás seguro de que deseas dar de baja al <strong>Dr. {{ doctor.nombre }}</strong>? Su acceso al sistema será revocado y sus pacientes actuales quedarán sin médico asignado.</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.baja_doctor', id=doctor.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar" style="background-color: #ea580c; color: white; border:none; width: 100%;">Sí, dar de baja</button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

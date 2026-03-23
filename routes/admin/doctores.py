@@ -272,3 +272,32 @@ def controles_doctor(id):
         })
         
     return render_template('admin/controles_doctor.html', doctor=doctor, controles=lista_controles)
+
+@admin_bp.route('/doctor/<int:id>/baja', methods=['POST'])
+def baja_doctor(id):
+    if session.get('rol') != 'admin': 
+        return redirect(url_for('auth.login'))
+
+    try:
+        doctor = Doctor.query.get_or_404(id)
+        # Buscamos también su cuenta de usuario asociada
+        usuario = Usuario.query.get(doctor.id_usuario)
+        
+        hoy = date.today()
+        
+        # 1. Registramos la baja en el perfil del doctor y en su usuario
+        doctor.fecha_baja_doctor = hoy
+        if usuario:
+            usuario.fecha_baja = hoy
+            
+        # 2. Lo desvinculamos automáticamente de todos sus pacientes asignados
+        doctor.pacientes = []
+
+        db.session.commit()
+        flash(f'El Dr. {doctor.nombre} {doctor.apellido} ha sido dado de baja y desvinculado de sus pacientes.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al dar de baja al doctor: {str(e)}', 'error')
+
+    return redirect(url_for('admin.perfil_doctor', id=id))
