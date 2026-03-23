@@ -249,3 +249,26 @@ def pacientes_doctor(id):
         })
         
     return render_template('admin/pacientes_doctor.html', doctor=doctor, pacientes=lista_pacientes)
+
+@admin_bp.route('/doctor/<int:id>/controles')
+def controles_doctor(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    
+    doctor = Doctor.query.get_or_404(id)
+    # Obtenemos los controles de este doctor ordenados por fecha descendente
+    controles_db = ControlMedico.query.filter_by(id_doctor=id).order_by(ControlMedico.fecha_control.desc()).all()
+    
+    lista_controles = []
+    for c in controles_db:
+        paciente = Paciente.query.get(c.id_paciente)
+        lista_controles.append({
+            'id': c.id,
+            'paciente_nombre': f"{paciente.nombre} {paciente.apellido}" if paciente else "Desconocido",
+            'paciente_id': paciente.id if paciente else None,
+            'fecha': c.fecha_control.strftime('%d/%m/%Y'),
+            'fecha_raw': c.fecha_control.strftime('%Y-%m-%d'),
+            'notas': c.notas or "Sin notas adicionales",
+            'estado_clinico': c.estado_clinico
+        })
+        
+    return render_template('admin/controles_doctor.html', doctor=doctor, controles=lista_controles)

@@ -1,0 +1,65 @@
+/* static/admin/controles_doctor.css */
+
+.controles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.control-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--admin-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Para que todas las tarjetas midan igual */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+}
+
+.control-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px -8px rgba(20, 85, 211, 0.3);
+    border-color: #bfdbfe;
+}
+
+.control-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--admin-text-dark);
+    margin-bottom: 8px;
+}
+
+.control-card .fecha {
+    font-size: 12px;
+    color: var(--admin-text-gray);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.control-card .notas {
+    font-size: 13px;
+    color: var(--admin-text-gray);
+    line-height: 1.5;
+    flex-grow: 1; 
+    display: -webkit-box;
+    -webkit-line-clamp: 4; 
+    line-clamp: 4; /* <-- Agrega esta línea para quitar la advertencia */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.fin-resultados {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
