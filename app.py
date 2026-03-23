@@ -3,7 +3,7 @@ from models import db
 # Importaciones ajustadas a tu estructura de carpetas
 from routes.admin import admin_bp
 from routes.inicio_sesion import auth_bp
-from routes.doctor import doctor_bp
+from routes.doctor.doctor import doctor_bp
 from routes.paciente import paciente_bp
 
 app = Flask(__name__)

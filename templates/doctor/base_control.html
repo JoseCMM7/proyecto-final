@@ -29,7 +29,8 @@
                 <a href="{{ url_for('doctor.home') }}" class="menu-item {% if request.endpoint == 'doctor.home' %}active{% endif %}">
                     <i class="fas fa-home"></i> Home
                 </a>
-                <a href="#" class="menu-item">
+                
+                <a href="#" class="menu-item {% if request.endpoint == 'doctor.mis_pacientes' %}active{% endif %}">
                     <i class="fas fa-user-injured"></i> Mis Pacientes
                 </a>
             </div>
