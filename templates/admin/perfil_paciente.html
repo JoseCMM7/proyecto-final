@@ -1,6 +1,6 @@
-{% extends 'admin/base_admin.html' %}
+{% extends 'doctor/base_control.html' %}
 
-{% block title %}Perfil de {{ paciente.nombre }}{% endblock %}
+{% block title %}Expediente: {{ paciente.nombre }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='admin/perfiles_base.css') }}">
@@ -9,73 +9,30 @@
 
 {% block content %}
 <div class="breadcrumb">
-    <a href="{{ url_for('admin.pacientes') }}">Pacientes</a> / <span>{{ paciente.nombre }} {{ paciente.apellido }}</span>
+    <a href="{{ url_for('doctor.pacientes') }}">Mis Pacientes</a> / <span>{{ paciente.nombre }} {{ paciente.apellido }}</span>
 </div>
 
 <div class="perfil-header">
     <div class="titulo-estado">
-        <h1>{{ paciente.nombre }} {{ paciente.apellido }}
-        {% if paciente.fecha_baja_paciente %}
-        <span style="font-size: 11px; font-weight: 800; background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; vertical-align: middle; margin-left: 12px; letter-spacing: 0.5px;">INACTIVO</span>
-        {% endif %}
-        </h1>
+        <h1>{{ paciente.nombre }} {{ paciente.apellido }}</h1>
         <span class="badge-estado {{ estado | lower }}">ESTADO {{ estado }}</span>
     </div>
-    <p class="subtitulo">Perfil del paciente</p>
-    
-    <div class="menu-opciones" tabindex="0">
-        <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
-        <div class="dropdown-content">
-            <a href="#modalEditarPaciente" class="dropdown-item">
-                <i class="fas fa-edit"></i> Editar datos
-            </a>
-            
-            <a href="#modalDarBajaPaciente" class="dropdown-item" style="color: #ea580c;">
-                <i class="fas fa-power-off"></i> Dar de baja
-            </a>
-            
-            <a href="#confirmar-eliminar-paciente" class="dropdown-item item-peligro">
-                <i class="fas fa-trash-alt"></i> Eliminar paciente
-            </a>
-        </div>
-    </div>
+    <p class="subtitulo">Expediente Clínico Electrónico</p>
 </div>
 
 <div class="top-cards-grid">
     <div class="card-blanca">
         <h3 class="seccion-titulo">INFORMACIÓN PERSONAL</h3>
         <div class="info-grid">
-            <div class="dato-box">
-                <label>Nombre</label>
-                <p>{{ paciente.nombre }} {{ paciente.apellido }}</p>
-            </div>
-            <div class="dato-box">
-                <label>Fecha de nacimiento</label>
-                <p>{{ paciente.fecha_nacimiento.strftime('%d %b %Y') }}</p>
-            </div>
-            <div class="dato-box">
-                <label>Teléfono</label>
-                <p>{{ paciente.telefono or 'No registrado' }}</p>
-            </div>
-            <div class="dato-box">
-                <label>Email</label>
-                <p>{{ paciente.email or 'No registrado' }}</p>
-            </div>
-            <div class="dato-box">
-                <label>Fecha de ingreso</label>
-                <p>{{ paciente.fecha_ingreso.strftime('%d %b %Y') }}</p>
-            </div>
-            {% if paciente.fecha_baja_paciente %}
-            <div class="dato-box">
-                <label style="color: #b91c1c;">Fecha de baja</label>
-                <p style="color: #b91c1c; font-weight: 600;">{{ paciente.fecha_baja_paciente.strftime('%d %b %Y') }}</p>
-            </div>
-            {% endif %}
+            <div class="dato-box"><label>Nombre</label><p>{{ paciente.nombre }} {{ paciente.apellido }}</p></div>
+            <div class="dato-box"><label>Fecha de nacimiento</label><p>{{ paciente.fecha_nacimiento.strftime('%d %b %Y') }}</p></div>
+            <div class="dato-box"><label>Teléfono</label><p>{{ paciente.telefono or 'No registrado' }}</p></div>
+            <div class="dato-box"><label>Email</label><p>{{ paciente.email or 'No registrado' }}</p></div>
         </div>
     </div>
 
     <div class="card-azul">
-        <h3 class="seccion-titulo-azul">RESUMEN CLÍNICO</h3>
+        <h3 class="seccion-titulo-azul">DIAGNÓSTICO PRINCIPAL</h3>
         <div class="resumen-flex">
             <div class="dato-principal">
                 <label>Enfermedad</label>
@@ -87,9 +44,9 @@
             </div>
         </div>
         <div class="actividad-box">
-            <label>Actividad mínima diaria</label>
+            <label>Meta de actividad física</label>
             <div class="metros">
-                <h2>{{ paciente.actividad_minima }}</h2> <span>metros</span> <i class="fas fa-walking"></i>
+                <h2>{{ paciente.actividad_minima }}</h2> <span>metros diarios</span>
             </div>
         </div>
     </div>
@@ -97,49 +54,11 @@
 
 <div class="card-lista">
     <div class="card-lista-header">
-        <h3 class="seccion-titulo">DOCTORES</h3>
-        <a href="#modalAsignarDoctor" class="btn-text-primary">+ Asignar doctor</a>
+        <h3 class="seccion-titulo">CONTACTOS DE EMERGENCIA (FAMILIARES)</h3>
     </div>
     <table class="tabla-limpia">
         <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Especialidad</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for doc in doctores %}
-            <tr>
-                <td><strong>Dr. {{ doc.nombre }} {{ doc.apellido }}</strong></td>
-                <td>{{ doc.especialidad_rel.nombre if doc.especialidad_rel else 'General' }}</td>
-                <td>{{ doc.email }}</td>
-                <td>{{ doc.telefono }}</td>
-                <td><a href="#modalQuitarDoc-{{ doc.id }}" class="text-danger">Quitar</a></td>
-            </tr>
-            {% else %}
-            <tr><td colspan="5">No hay doctores asignados.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div class="card-lista">
-    <div class="card-lista-header">
-        <h3 class="seccion-titulo">FAMILIARES</h3>
-        <a href="#modalAgregarFamiliar" class="btn-text-primary">+ Agregar familiar</a>
-    </div>
-    <table class="tabla-limpia">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Relación</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Acción</th>
-            </tr>
+            <tr><th>Nombre</th><th>Parentesco</th><th>Email</th><th>Teléfono</th></tr>
         </thead>
         <tbody>
             {% for fam in familiares %}
@@ -148,10 +67,9 @@
                 <td>{{ fam.relacion }}</td>
                 <td>{{ fam.datos.email or 'N/A' }}</td>
                 <td>{{ fam.datos.numero or 'N/A' }}</td>
-                <td><a href="#modalQuitarFam-{{ fam.datos.id }}" class="text-danger">Eliminar</a></td>
             </tr>
             {% else %}
-            <tr><td colspan="5">No hay familiares registrados.</td></tr>
+            <tr><td colspan="4">No hay contactos de emergencia registrados.</td></tr>
             {% endfor %}
         </tbody>
     </table>
@@ -159,65 +77,73 @@
 
 <div class="card-lista">
     <div class="card-lista-header">
-        <h3 class="seccion-titulo">DISPOSITIVOS</h3>
-        <div class="botones-header">
-            <a href="#modalAsignarBeacon" class="btn-outline-primary">+ Asignar Beacon</a>
-            <a href="#modalAsignarGPS" class="btn-outline-primary">+ Asignar GPS</a>
-            <a href="#modalAsignarNFC" class="btn-outline-primary">+ Asignar NFC</a>
-        </div>
+        <h3 class="seccion-titulo">DISPOSITIVOS DE MONITOREO ACTIVOS</h3>
     </div>
     <div class="dispositivos-grid">
         <div class="dispositivo-col">
             <label class="seccion-titulo" style="font-size: 10px;">BEACONS</label>
             {% for beacon in beacons %}
             <div class="dispositivo-item">
-                <div class="disp-info">
-                    <h4>{{ beacon.nombre }}</h4>
-                    <p>Registrado: {{ beacon.fecha_registro_beacon.strftime('%d %b %Y') }}</p>
-                </div>
-                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#modalQuitarBeacon-{{ beacon.id }}" class="text-danger">Quitar</a></div>
+                <div class="disp-info"><h4>{{ beacon.nombre }}</h4></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div></div>
             </div>
-            {% else %}<p class="empty-text">Sin beacons asignados.</p>{% endfor %}
+            {% else %}<p class="empty-text">Sin beacons.</p>{% endfor %}
         </div>
-        
         <div class="dispositivo-col">
             <label class="seccion-titulo" style="font-size: 10px;">GPS</label>
             {% for g in gps %}
             <div class="dispositivo-item">
-                <div class="disp-info">
-                    <h4>{{ g.nombre }}</h4>
-                    <p>Registrado: {{ g.fecha_registro_gps.strftime('%d %b %Y') }}</p>
-                </div>
-                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#modalQuitarGPS-{{ g.id }}" class="text-danger">Quitar</a></div>
+                <div class="disp-info"><h4>{{ g.nombre }}</h4></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div></div>
             </div>
-            {% else %}<p class="empty-text">Sin GPS asignado.</p>{% endfor %}
+            {% else %}<p class="empty-text">Sin GPS.</p>{% endfor %}
         </div>
-
         <div class="dispositivo-col">
-            <label class="seccion-titulo" style="font-size: 10px;">NFC</label>
+            <label class="seccion-titulo" style="font-size: 10px;">NFC (PULSERA)</label>
             {% for n in nfc %}
             <div class="dispositivo-item">
-                <div class="disp-info">
-                    <h4>{{ n.nombre }}</h4>
-                    <p>Registrado: {{ n.fecha_registro_nfc.strftime('%d %b %Y') }}</p>
-                </div>
-                <div class="disp-status"><div class="status-dot dot-activo"></div><a href="#modalQuitarNFC-{{ n.id }}" class="text-danger">Quitar</a></div>
+                <div class="disp-info"><h4>{{ n.nombre }}</h4></div>
+                <div class="disp-status"><div class="status-dot dot-activo"></div></div>
             </div>
-            {% else %}<p class="empty-text">Sin NFC asignado.</p>{% endfor %}
+            {% else %}<p class="empty-text">Sin NFC.</p>{% endfor %}
         </div>
     </div>
 </div>
 
-<div class="card-lista">
-    <div class="card-lista-header" style="padding-bottom: 0;">
-        <h3 class="seccion-titulo">CONTROLES MÉDICOS</h3>
+<div class="seccion-tratamientos">
+    <h3 class="seccion-titulo">TRATAMIENTOS ACTIVOS</h3>
+    {% for trat in tratamientos %}
+    <div class="card-tratamiento">
+        <div class="trat-header">
+            <h4>{{ trat.nombre }}</h4>
+            <span class="badge-med">{{ trat.tipo|upper }}</span>
+        </div>
+        <p class="trat-desc">{{ trat.descripcion }}</p>
+        <p class="trat-doctor">Recetado por: {{ trat.doctor_nombre }}</p>
+        <div class="trat-metricas">
+            <div class="metrica"><label>DOSIS</label><p>{{ trat.dosis_valor }} {{ trat.dosis_unidad }}</p></div>
+            <div class="metrica"><label>FRECUENCIA</label><p>{{ trat.frecuencia_valor }} vez / {{ trat.frecuencia_unidad }}</p></div>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: var(--admin-text-gray);">El paciente no tiene tratamientos activos registrados.</p>
+    {% endfor %}
+</div>
+
+<div class="card-lista" style="margin-top: 32px;">
+    <div class="card-lista-header" style="padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+        <h3 class="seccion-titulo">HISTORIAL DE CONTROLES MÉDICOS</h3>
+        
+        <a href="#modalRegistrarControl" style="color: var(--admin-primary); font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--admin-primary); padding: 8px 16px; border-radius: 6px;">
+            + Registrar Control
+        </a>
     </div>
     <table class="tabla-limpia">
         <thead>
             <tr style="background-color: #f8fafc;">
-                <th>Fecha del control</th>
-                <th>Doctor responsable</th>
-                <th>Notas médicas</th>
+                <th>Fecha</th>
+                <th>Médico Evaluador</th>
+                <th>Notas Clínicas</th>
             </tr>
         </thead>
         <tbody>
@@ -228,417 +154,89 @@
                 <td style="color: var(--admin-text-gray);">{{ c.notas }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="3">No hay controles registrados.</td></tr>
+            <tr><td colspan="3">No hay notas de evolución registradas aún.</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<div class="seccion-tratamientos">
-    <h3 class="seccion-titulo">TRATAMIENTOS</h3>
-    {% for trat in tratamientos %}
-    <div class="card-tratamiento">
-        <div class="trat-header">
-            <h4>{{ trat.nombre }}</h4>
-            <span class="badge-med">{{ trat.tipo|upper }}</span>
-        </div>
-        <p class="trat-desc">{{ trat.descripcion }}</p>
-        <p class="trat-doctor">Asignado por: {{ trat.doctor_nombre }}</p>
-        
-        <div class="trat-metricas">
-            <div class="metrica">
-                <label>DOSIS</label>
-                <p>{{ trat.dosis_valor }} {{ trat.dosis_unidad }}</p>
-            </div>
-            <div class="metrica">
-                <label>FRECUENCIA</label>
-                <p>{{ trat.frecuencia_valor }} vez / {{ trat.frecuencia_unidad }}</p>
-            </div>
-            <div class="metrica">
-                <label>INICIO</label>
-                <p>{{ trat.fecha_inicio.strftime('%d %b %Y') }}</p>
-            </div>
-            <div class="metrica">
-                <label>FIN</label>
-                <p>{% if trat.fecha_fin %}{{ trat.fecha_fin.strftime('%d %b %Y') }}{% else %}Indefinido{% endif %}</p>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <p>No hay tratamientos activos para este paciente.</p>
-    {% endfor %}
-</div>
-
-<div class="stats-grid">
-    <div class="card-blanca">
-        <div class="stat-header">
-            <h3 class="seccion-titulo">ACTIVIDAD DIARIA (M)</h3>
-            <span class="stat-legend"><div class="dot-legend"></div> Metros recorridos</span>
-        </div>
-        <div class="chart-container line-chart-mock">
-            <svg viewBox="0 0 500 150" preserveAspectRatio="none" style="width: 100%; height: 150px; stroke: var(--admin-primary); stroke-width: 3; fill: none;">
-                <path d="M 0 100 L 80 80 L 160 110 L 240 40 L 320 60 L 400 20 L 480 50 L 500 70" />
-            </svg>
-            <div class="chart-x-axis">
-                <span>LUN</span><span>MAR</span><span>MIE</span><span>JUE</span><span>VIE</span><span>SAB</span><span>DOM</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="card-blanca">
-        <h3 class="seccion-titulo">COMPARATIVA SEMANAL</h3>
-        <div class="bar-chart-css">
-            <div class="bar bar-gray" style="height: 40%;"></div>
-            <div class="bar bar-gray" style="height: 60%;"></div>
-            <div class="bar bar-blue" style="height: 90%;"></div>
-            <div class="bar bar-gray" style="height: 50%;"></div>
-        </div>
-        <p class="stat-insight">
-            "El paciente muestra un incremento del 12% en la movilidad respecto a la semana anterior."
-        </p>
-    </div>
-</div>
-
-<div id="confirmar-eliminar" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta">
-            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
-            <h3>Eliminar paciente</h3>
-        </div>
-        <p>¿Estás seguro de que deseas eliminar este paciente? Esta acción no se puede deshacer y se borrarán todos los registros asociados.</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.eliminar_paciente', id=paciente.id) }}" method="POST" style="margin:0; width:48%;">
-                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Eliminar</button>
-            </form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="modalAsignarDoctor">
-    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
-        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
-        <div class="modal-header" style="margin-bottom: 24px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar nuevo doctor</h2>
-            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Seleccione el especialista que tendrá acceso al expediente.</p>
-        </div>
-        <form action="{{ url_for('admin.asignar_doctor', id=paciente.id) }}" method="POST">
-            <div class="form-group">
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Doctores Disponibles</label>
-                <select name="id_doctor" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;" required>
-                    <option value="">-- Seleccione un doctor --</option>
-                    {% for doc in doctores_para_asignar %}
-                        <option value="{{ doc.id }}">Dr. {{ doc.nombre }} {{ doc.apellido }} ({{ doc.especialidad_rel.nombre if doc.especialidad_rel else 'General' }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
-                <a href="#" class="btn-secondary" style="background: transparent; color: var(--admin-text-gray); border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none;">Cancelar</a>
-                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;">Asignar Doctor</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-{% for doc in doctores %}
-<div id="modalQuitarDoc-{{ doc.id }}" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta">
-            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
-            <h3>Quitar doctor</h3>
-        </div>
-        <p>¿Estás seguro de que deseas quitar al <strong>Dr. {{ doc.nombre }} {{ doc.apellido }}</strong> de este paciente?</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_doctor', id_paciente=paciente.id, id_doctor=doc.id) }}" method="POST" style="margin:0; width:48%;">
-                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button>
-            </form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<div class="modal-overlay" id="modalAgregarFamiliar">
-    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
-        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
-        <div class="modal-header" style="margin-bottom: 24px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Agregar familiar</h2>
-            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Registre un nuevo contacto de emergencia.</p>
-        </div>
-        <form action="{{ url_for('admin.agregar_familiar', id=paciente.id) }}" method="POST">
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Nombre</label><input type="text" name="nombre_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;" required></div>
-                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Apellido</label><input type="text" name="apellido_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;" required></div>
-            </div>
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Email</label><input type="email" name="email_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;"></div>
-                <div class="form-group"><label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Teléfono</label><input type="text" name="telefono_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;"></div>
-            </div>
-            <div class="form-group">
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Relación</label>
-                <select name="relacion_fam" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;" required>
-                    <option value="">Seleccione parentesco</option>
-                    <option value="Hijo/a">Hijo/a</option>
-                    <option value="Esposo/a">Esposo/a</option>
-                    <option value="Padre/Madre">Padre/Madre</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
-                <a href="#" class="btn-secondary" style="background: transparent; color: var(--admin-text-gray); border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none;">Cancelar</a>
-                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;">Guardar Familiar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-{% for fam in familiares %}
-<div id="modalQuitarFam-{{ fam.datos.id }}" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta">
-            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
-            <h3>Quitar familiar</h3>
-        </div>
-        <p>¿Estás seguro de que deseas desvincular a <strong>{{ fam.datos.nombre }} {{ fam.datos.apellido }}</strong> de este paciente?</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_familiar', id_paciente=paciente.id, id_familiar=fam.datos.id) }}" method="POST" style="margin:0; width:48%;">
-                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button>
-            </form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<div class="modal-overlay" id="modalEditarPaciente">
-    <div class="modal-content" style="width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; padding: 40px; position: relative;">
+<div class="modal-overlay" id="modalRegistrarControl">
+    <div class="modal-content" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 40px; position: relative;">
         <a href="#" class="modal-close" style="text-decoration: none; position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); font-size: 20px;"><i class="fas fa-times"></i></a>
         
         <div class="modal-header" style="margin-bottom: 32px; text-align: left;">
-            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Editar datos del paciente</h2>
-            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Modifique la información y guarde los cambios.</p>
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Registrar control clínico</h2>
         </div>
 
-        <form action="{{ url_for('admin.editar_paciente', id=paciente.id) }}" method="POST" style="text-align: left;">
-            <div class="form-grid">
-                <div class="col-left">
-                    <div class="form-section-title">Información Personal</div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Primer Nombre</label><input type="text" name="nombre" class="form-control" value="{{ paciente.nombre }}" required></div>
-                        <div class="form-group"><label>Primer Apellido</label><input type="text" name="apellido" class="form-control" value="{{ paciente.apellido }}" required></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" class="form-control" value="{{ paciente.fecha_nacimiento.strftime('%Y-%m-%d') }}" required></div>
-                        <div class="form-group"><label>Teléfono</label><input type="text" name="telefono" class="form-control" value="{{ paciente.telefono or '' }}"></div>
-                    </div>
-                    <div class="form-group"><label>Email de contacto</label><input type="email" name="email" class="form-control" value="{{ paciente.email or '' }}"></div>
+        <form action="{{ url_for('doctor.registrar_control', id=paciente.id) }}" method="POST" style="text-align: left;">
+            <div class="form-section-title">PACIENTE</div>
+            <div class="form-group" style="margin-bottom: 32px;">
+                <label>SELECCIONAR PACIENTE</label>
+                <input type="text" class="form-control" value="{{ paciente.nombre }} {{ paciente.apellido }}" readonly style="background-color: #f8fafc; color: var(--admin-text-gray);">
+            </div>
 
-                    <div class="form-section-title" style="margin-top: 32px;">Cuenta del Paciente</div>
-                    <div class="box-section form-row">
-                        <div class="form-group" style="margin-bottom: 0;"><label>Username</label><input type="text" name="username" class="form-control" value="{{ usuario_paciente.username }}" required></div>
-                        <div class="form-group" style="margin-bottom: 0;"><label>Nueva Password (Opcional)</label><input type="password" name="password" class="form-control" placeholder="Dejar en blanco para no cambiar"></div>
+            <div class="form-section-title">SECCIÓN 2 — CONTROL</div>
+            <div class="box-section" style="margin-bottom: 32px;">
+                <div class="form-group">
+                    <label>TÍTULO DEL CONTROL</label>
+                    <input type="text" name="titulo" class="form-control" placeholder="Ej. Control de Seguimiento de Glucosa" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>FECHA</label>
+                        <input type="date" name="fecha" class="form-control" required>
                     </div>
-
-                    <div class="form-section-title" style="margin-top: 32px;">Dispositivos IOT</div>
-                    <div class="box-section">
-                        <div class="form-group">
-                            <label>Asignar GPS</label>
-                            <select name="id_gps" class="form-control">
-                                <option value="">-- Sin asignar --</option>
-                                {% for g in gps_lista %}
-                                <option value="{{ g.id }}" {% if g.id == current_gps %}selected{% endif %}>{{ g.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label>Asignar Beacon</label>
-                                <select name="id_beacon" class="form-control">
-                                    <option value="">-- Sin asignar --</option>
-                                    {% for b in bea_lista %}
-                                    <option value="{{ b.id }}" {% if b.id == current_beacon %}selected{% endif %}>{{ b.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label>Asignar NFC</label>
-                                <select name="id_nfc" class="form-control">
-                                    <option value="">-- Sin asignar --</option>
-                                    {% for n in nfc_lista %}
-                                    <option value="{{ n.id }}" {% if n.id == current_nfc %}selected{% endif %}>{{ n.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>HORA</label>
+                        <input type="time" name="hora" class="form-control" required>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>ESTADO DEL CONTROL</label>
+                    <select name="estado_clinico" class="form-control" required>
+                        <option value="">Seleccione el estado clínico actual...</option>
+                        <option value="estable">Estable</option>
+                        <option value="mejora">Mejora</option>
+                        <option value="deterioro">Deterioro</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>NOTAS MÉDICAS</label>
+                    <textarea name="notas" class="form-control" rows="4" placeholder="Escriba las observaciones clínicas del control..." style="resize: none;"></textarea>
+                </div>
+            </div>
 
-                <div class="col-right">
-                    <div class="form-section-title">Información Clínica</div>
-                    <div class="form-group">
-                        <label>Enfermedad Principal</label>
-                        <select name="id_enfermedad" class="form-control" required>
-                            <option value="">Seleccione una patología</option>
-                            {% for enf in enfermedades_disponibles %}
-                                <option value="{{ enf.id }}" {% if paciente_enf and enf.id == paciente_enf.id_enfermedad %}selected{% endif %}>{{ enf.nombre }}</option>
+            <div class="form-section-title">SECCIÓN 3 — INDICADORES REGISTRADOS</div>
+            <div class="box-section">
+                <p style="font-size: 12px; color: var(--admin-text-gray); margin-bottom: 16px;">Seleccione hasta 5 indicadores de la lista. El sistema ignorará automáticamente los indicadores duplicados en una misma sesión.</p>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 12px; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
+                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">INDICADOR CLÍNICO</label>
+                    <label style="font-size: 10px; color: var(--admin-text-gray); font-weight: 700;">VALOR</label>
+                </div>
+
+                {% for i in range(1, 6) %}
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 12px; align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <select name="id_ind_{{ i }}" class="form-control">
+                            <option value="">-- Seleccionar Indicador --</option>
+                            {% for ind in indicadores_disponibles %}
+                                <option value="{{ ind.id }}">{{ ind.nombre }} ({{ ind.unidad_medida }})</option>
                             {% endfor %}
                         </select>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Grado / Subtipo</label>
-                        <select name="id_subtipo" class="form-control">
-                            <option value="">Seleccione un subtipo (si aplica)</option>
-                            {% for sub in subtipos_actuales %}
-                                <option value="{{ sub.id }}" {% if paciente_enf and sub.id == paciente_enf.id_subtipo %}selected{% endif %}>{{ sub.descripcion }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="form-group"><label>Actividad física mínima recomendada (Pasos/Día)</label><input type="number" name="actividad_minima" class="form-control" value="{{ paciente.actividad_minima }}"></div>
-
-                    <div class="form-section-title" style="margin-top: 32px;">Familiar Responsable Principal</div>
-                    <div class="box-section">
-                        <div class="form-row">
-                            <div class="form-group"><label>Nombre</label><input type="text" name="nombre_fam" class="form-control" value="{{ familiar_actual.nombre if familiar_actual else '' }}"></div>
-                            <div class="form-group"><label>Apellido</label><input type="text" name="apellido_fam" class="form-control" value="{{ familiar_actual.apellido if familiar_actual else '' }}"></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>Email</label><input type="email" name="email_fam" class="form-control" value="{{ familiar_actual.email if familiar_actual else '' }}"></div>
-                            <div class="form-group"><label>Teléfono</label><input type="text" name="telefono_fam" class="form-control" value="{{ familiar_actual.numero if familiar_actual else '' }}"></div>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Relación</label>
-                            <select name="relacion_fam" class="form-control">
-                                <option value="Hijo/a" {% if relacion_actual == 'Hijo/a' %}selected{% endif %}>Hijo/a</option>
-                                <option value="Esposo/a" {% if relacion_actual == 'Esposo/a' %}selected{% endif %}>Esposo/a</option>
-                                <option value="Padre/Madre" {% if relacion_actual == 'Padre/Madre' %}selected{% endif %}>Padre/Madre</option>
-                                <option value="Otro" {% if relacion_actual == 'Otro' %}selected{% endif %}>Otro</option>
-                            </select>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="number" step="0.01" name="valor_ind_{{ i }}" class="form-control" placeholder="0.00">
                     </div>
                 </div>
+                {% endfor %}
             </div>
 
             <div class="modal-footer" style="margin-top: 32px;">
                 <a href="#" class="btn-secondary">Descartar cambios</a>
-                <button type="submit" class="btn-primary">Guardar Cambios</button>
+                <button type="submit" class="btn-primary">Guardar Control</button>
             </div>
         </form>
     </div>
 </div>
-
-<div class="modal-overlay" id="modalAsignarBeacon">
-    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
-        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
-        <div class="modal-header" style="margin-bottom: 24px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar Beacon</h2>
-            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Seleccione el beacon a vincular.</p>
-        </div>
-        <form action="{{ url_for('admin.asignar_dispositivo', id=paciente.id, tipo='beacon') }}" method="POST">
-            <select name="id_dispositivo" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" required>
-                <option value="">-- Seleccione un Beacon --</option>
-                {% for b in bea_lista %}<option value="{{ b.id }}">{{ b.nombre }}</option>{% endfor %}
-            </select>
-            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
-                <a href="#" class="btn-secondary" style="color: var(--admin-text-gray); text-decoration: none; padding: 12px 24px; font-weight: 600;">Cancelar</a>
-                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="modal-overlay" id="modalAsignarGPS">
-    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
-        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
-        <div class="modal-header" style="margin-bottom: 24px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar GPS</h2>
-        </div>
-        <form action="{{ url_for('admin.asignar_dispositivo', id=paciente.id, tipo='gps') }}" method="POST">
-            <select name="id_dispositivo" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" required>
-                <option value="">-- Seleccione un GPS --</option>
-                {% for g in gps_lista %}<option value="{{ g.id }}">{{ g.nombre }}</option>{% endfor %}
-            </select>
-            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
-                <a href="#" class="btn-secondary" style="color: var(--admin-text-gray); text-decoration: none; padding: 12px 24px; font-weight: 600;">Cancelar</a>
-                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="modal-overlay" id="modalAsignarNFC">
-    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
-        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
-        <div class="modal-header" style="margin-bottom: 24px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar NFC</h2>
-        </div>
-        <form action="{{ url_for('admin.asignar_dispositivo', id=paciente.id, tipo='nfc') }}" method="POST">
-            <select name="id_dispositivo" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" required>
-                <option value="">-- Seleccione un NFC --</option>
-                {% for n in nfc_lista %}<option value="{{ n.id }}">{{ n.nombre }}</option>{% endfor %}
-            </select>
-            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
-                <a href="#" class="btn-secondary" style="color: var(--admin-text-gray); text-decoration: none; padding: 12px 24px; font-weight: 600;">Cancelar</a>
-                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-{% for beacon in beacons %}
-<div id="modalQuitarBeacon-{{ beacon.id }}" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular Beacon</h3></div>
-        <p>¿Seguro que deseas desvincular el beacon <strong>{{ beacon.nombre }}</strong>?</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='beacon', id_disp=beacon.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button></form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-{% for g in gps %}
-<div id="modalQuitarGPS-{{ g.id }}" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular GPS</h3></div>
-        <p>¿Seguro que deseas desvincular el GPS <strong>{{ g.nombre }}</strong>?</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='gps', id_disp=g.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button></form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-{% for n in nfc %}
-<div id="modalQuitarNFC-{{ n.id }}" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta"><i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i><h3>Desvincular NFC</h3></div>
-        <p>¿Seguro que deseas desvincular el dispositivo NFC <strong>{{ n.nombre }}</strong>?</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.quitar_dispositivo', id_paciente=paciente.id, tipo='nfc', id_disp=n.id) }}" method="POST" style="margin:0; width:48%;"><button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button></form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<div id="modalDarBajaPaciente" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-alerta">
-            <i class="fas fa-power-off" style="color: #ea580c; font-size: 20px;"></i>
-            <h3 style="color: #ea580c;">Dar de baja paciente</h3>
-        </div>
-        <p>¿Estás seguro de que deseas dar de baja a <strong>{{ paciente.nombre }}</strong>? Se le desvinculará de sus doctores, se liberarán sus dispositivos y ya no podrá acceder al sistema.</p>
-        <div class="modal-buttons">
-            <form action="{{ url_for('admin.baja_paciente', id=paciente.id) }}" method="POST" style="margin:0; width:48%;">
-                <button type="submit" class="btn-modal btn-confirmar" style="background-color: #ea580c; color: white; border:none; width: 100%;">Sí, dar de baja</button>
-            </form>
-            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
