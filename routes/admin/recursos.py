@@ -1,5 +1,5 @@
 from flask import render_template, session, redirect, url_for, request, flash
-from datetime import date
+from datetime import date, datetime
 from models import (
     db, Administrador, DispositivoGPS, DispositivoBeacon, DispositivoNFC,
     AsignacionGPS, AsignacionBeacon, AsignacionNFC,
@@ -232,3 +232,48 @@ def eliminar_recurso(tipo, id):
 
     # Redirigimos al inventario general
     return redirect(url_for('admin.recursos'))
+
+@admin_bp.route('/recurso/<tipo>/<int:id>/baja', methods=['POST'])
+def baja_recurso(tipo, id):
+    if session.get('rol') != 'admin': 
+        return redirect(url_for('auth.login'))
+
+    try:
+        hoy = date.today()
+        ahora = datetime.now() # Agregamos la hora exacta
+        
+        if tipo == 'gps':
+            dispositivo = DispositivoGPS.query.get_or_404(id)
+            dispositivo.estado_gps = 'Inactivo'
+            dispositivo.fecha_baja_gps = hoy
+            
+            asignaciones_activas = AsignacionGPS.query.filter_by(id_gps=id, fecha_retiro=None).all()
+            for asig in asignaciones_activas:
+                asig.fecha_retiro = ahora # Usamos 'ahora' (DateTime)
+                
+        elif tipo == 'beacon':
+            dispositivo = DispositivoBeacon.query.get_or_404(id)
+            dispositivo.estado_beacon = 'Inactivo'
+            dispositivo.fecha_baja_beacon = hoy
+            
+            asignaciones_activas = AsignacionBeacon.query.filter_by(id_beacon=id, fecha_retiro=None).all()
+            for asig in asignaciones_activas:
+                asig.fecha_retiro = ahora # Usamos 'ahora' (DateTime)
+                
+        elif tipo == 'nfc':
+            dispositivo = DispositivoNFC.query.get_or_404(id)
+            dispositivo.estado_nfc = 'Inactivo'
+            dispositivo.fecha_baja_nfc = hoy
+            
+            asignaciones_activas = AsignacionNFC.query.filter_by(id_nfc=id, fecha_retiro=None).all()
+            for asig in asignaciones_activas:
+                asig.fecha_retiro = hoy # NFC usa Date normal, se queda con 'hoy'
+
+        db.session.commit()
+        flash(f'El dispositivo {tipo.upper()} ha sido dado de baja y desvinculado.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al dar de baja: {str(e)}', 'error')
+
+    return redirect(url_for('admin.perfil_recurso', tipo=tipo, id=id))

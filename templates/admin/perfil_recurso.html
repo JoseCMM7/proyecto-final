@@ -24,6 +24,9 @@
             <a href="#modalEditarRecurso" class="dropdown-item">
                 <i class="fas fa-edit"></i> Editar datos
             </a>
+            <a href="#modalDarBajaRecurso" class="dropdown-item" style="color: #ea580c;">
+                <i class="fas fa-power-off"></i> Dar de baja
+            </a>
             <a href="#confirmar-eliminar-recurso" class="dropdown-item item-peligro">
                 <i class="fas fa-trash-alt"></i> Eliminar dispositivo
             </a>
@@ -215,6 +218,22 @@
                 <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar Cambios</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div id="modalDarBajaRecurso" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-power-off" style="color: #ea580c; font-size: 20px;"></i>
+            <h3 style="color: #ea580c;">Dar de baja dispositivo</h3>
+        </div>
+        <p>¿Estás seguro de que deseas dar de baja este dispositivo? Cambiará su estado a inactivo y registrará la fecha de hoy como fecha de baja.</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.baja_recurso', tipo=disp.tipo, id=disp.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar" style="background-color: #ea580c; color: white; border:none; width: 100%;">Sí, dar de baja</button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
     </div>
 </div>
 {% endblock %}
