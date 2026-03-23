@@ -146,6 +146,7 @@ def perfil_recurso(tipo, id):
         })
 
     datos_disp = {
+        'id': id,
         'nombre': disp_nombre, 'tipo': tipo,
         'fecha_reg': fecha_reg.strftime('%d/%m/%Y') if fecha_reg else 'N/A',
         'fecha_baja': fecha_baja.strftime('%d/%m/%Y') if fecha_baja else 'N/A',
@@ -154,3 +155,77 @@ def perfil_recurso(tipo, id):
     }
 
     return render_template('admin/perfil_recurso.html', disp=datos_disp, asignaciones=lista_asignaciones, logs=registros_logs)
+
+from flask import request, redirect, url_for, flash, session
+# Asegúrate de tener importado 'db' y tus modelos de dispositivos aquí arriba
+
+@admin_bp.route('/recurso/<tipo>/<int:id>/editar', methods=['POST'])
+def editar_recurso(tipo, id):
+    # Protección de ruta
+    if session.get('rol') != 'admin': 
+        return redirect(url_for('auth.login'))
+
+    # 1. Recibimos los datos del formulario HTML
+    nombre = request.form.get('nombre')
+
+    try:
+        # 2. Lógica dependiendo del tipo de dispositivo
+        if tipo == 'gps':
+            frecuencia = request.form.get('freq_gps')
+            # Aquí va tu código SQLAlchemy: 
+            # dispositivo = DispositivoGPS.query.get_or_404(id)
+            # dispositivo.nombre = nombre
+            
+        elif tipo == 'beacon':
+            tx_power = request.form.get('tx_power')
+            intervalo = request.form.get('intervalo_adv')
+            # Lógica SQLAlchemy para Beacon
+            
+        elif tipo == 'nfc':
+            codigo = request.form.get('codigo_nfc')
+            # Lógica SQLAlchemy para NFC
+
+        # db.session.commit() # Descomenta esto cuando conectes tus modelos
+        flash(f'Dispositivo {tipo.upper()} actualizado correctamente.', 'success')
+        
+    except Exception as e:
+        # db.session.rollback()
+        flash(f'Error al actualizar: {str(e)}', 'error')
+
+    return redirect(url_for('admin.perfil_recurso', tipo=tipo, id=id))
+
+
+@admin_bp.route('/recurso/<tipo>/<int:id>/eliminar', methods=['POST'])
+def eliminar_recurso(tipo, id):
+    if session.get('rol') != 'admin': 
+        return redirect(url_for('auth.login'))
+
+    try:
+        if tipo == 'gps':
+            # 1. Buscamos el dispositivo
+            dispositivo = DispositivoGPS.query.get_or_404(id)
+            
+            # 2. Eliminamos manualmente sus dependencias para evitar errores de Foreign Key
+            RegistroGPS.query.filter_by(id_gps=id).delete()
+            AsignacionGPS.query.filter_by(id_gps=id).delete()
+            
+            # 3. Eliminamos el dispositivo
+            db.session.delete(dispositivo)
+            db.session.commit()
+            
+            flash('Dispositivo GPS y todo su historial han sido eliminados permanentemente.', 'success')
+            
+        elif tipo == 'beacon':
+            # Lógica lista para cuando quieras implementar la eliminación de Beacons
+            pass
+            
+        elif tipo == 'nfc':
+            # Lógica lista para cuando quieras implementar la eliminación de NFC
+            pass
+
+    except Exception as e:
+        db.session.rollback() # Si algo falla, deshacemos cualquier cambio a medias
+        flash(f'Error al eliminar el dispositivo: {str(e)}', 'error')
+
+    # Redirigimos al inventario general
+    return redirect(url_for('admin.recursos'))

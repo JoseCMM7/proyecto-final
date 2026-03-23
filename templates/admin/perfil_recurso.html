@@ -17,7 +17,18 @@
         <h1>{{ disp.nombre }}</h1>
     </div>
     <p class="subtitulo">Info {{ disp.tipo|upper }}</p>
-    <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+    
+    <div class="menu-opciones" tabindex="0">
+        <button class="btn-opciones"><i class="fas fa-ellipsis-v"></i></button>
+        <div class="dropdown-content">
+            <a href="#modalEditarRecurso" class="dropdown-item">
+                <i class="fas fa-edit"></i> Editar datos
+            </a>
+            <a href="#confirmar-eliminar-recurso" class="dropdown-item item-peligro">
+                <i class="fas fa-trash-alt"></i> Eliminar dispositivo
+            </a>
+        </div>
+    </div>
 </div>
 
 <div class="top-cards-grid">
@@ -142,6 +153,68 @@
     </table>
     <div class="tabla-footer">
         <a href="#">VER TODAS LAS DETECCIONES</a>
+    </div>
+</div>
+
+<div id="confirmar-eliminar-recurso" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-alerta">
+            <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
+            <h3>Eliminar dispositivo</h3>
+        </div>
+        <p>¿Estás seguro de que deseas eliminar este dispositivo? Esta acción no se puede deshacer y se perderá todo su historial de asignaciones y logs.</p>
+        <div class="modal-buttons">
+            <form action="{{ url_for('admin.eliminar_recurso', tipo=disp.tipo, id=disp.id) }}" method="POST" style="margin:0; width:48%;">
+                <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Eliminar</button>
+            </form>
+            <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditarRecurso">
+    <div class="modal-content" style="width: 90%; max-width: 600px; padding: 32px; position: relative; text-align: left;">
+        <a href="#" class="modal-close" style="text-decoration: none; position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); font-size: 20px;"><i class="fas fa-times"></i></a>
+        
+        <div class="modal-header" style="margin-bottom: 32px;">
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--admin-text-dark);">Editar Dispositivo</h2>
+            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Modifique la información y guarde los cambios.</p>
+        </div>
+
+        <form action="{{ url_for('admin.editar_recurso', tipo=disp.tipo, id=disp.id) }}" method="POST">
+            <div class="form-group">
+                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Nombre del Dispositivo</label>
+                <input type="text" name="nombre" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ disp.nombre }}" required>
+            </div>
+            
+            {% if disp.tipo == 'gps' %}
+            <div class="form-group" style="margin-top: 16px;">
+                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Frecuencia Actualización</label>
+                <input type="text" name="freq_gps" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ disp.configs['FRECUENCIA ACTUALIZACIÓN'] }}">
+            </div>
+            {% elif disp.tipo == 'beacon' %}
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+                <div class="form-group">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">TX Power</label>
+                    <input type="text" name="tx_power" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ disp.configs['TX POWER'] }}">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Intervalo ADV</label>
+                    <input type="text" name="intervalo_adv" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ disp.configs['INTERVALO DE LLAMADAS'] }}">
+                </div>
+            </div>
+            {% elif disp.tipo == 'nfc' %}
+            <div class="form-group" style="margin-top: 16px;">
+                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Código NFC / UID</label>
+                <input type="text" name="codigo_nfc" class="form-control" style="width: 100%; padding: 12px; border: 1px solid var(--admin-border); border-radius: 8px;" value="{{ disp.configs['CÓDIGO NFC / UID'] }}" required>
+            </div>
+            {% endif %}
+
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
+                <a href="#" class="btn-secondary" style="background: transparent; color: var(--admin-text-gray); border: none; padding: 12px 24px; font-weight: 600; text-decoration: none;">Cancelar</a>
+                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Guardar Cambios</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
