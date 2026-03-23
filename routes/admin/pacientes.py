@@ -122,7 +122,13 @@ def perfil_paciente(id):
 
     doctores = paciente.doctores
     
-    # LA CORRECCIÓN: Ordenamos para cargar siempre a Maria (el primer familiar)
+    # Doctores disponibles para asignar (que NO tiene ya asignados)
+    doctores_asignados_ids = [d.id for d in doctores]
+    if doctores_asignados_ids:
+        doctores_para_asignar = Doctor.query.filter(~Doctor.id.in_(doctores_asignados_ids)).all()
+    else:
+        doctores_para_asignar = Doctor.query.all()
+        
     relaciones_fam = PacienteFamiliar.query.filter_by(id_paciente=id).order_by(PacienteFamiliar.id_familiar.asc()).all()
     familiares = []
     familiar_actual = None
@@ -162,10 +168,7 @@ def perfil_paciente(id):
 
     doctores_disponibles = Doctor.query.all()
     enfermedades_disponibles = Enfermedad.query.all()
-    
-    # LA CORRECCIÓN 2 (Cero JS): Enviamos TODOS los subtipos de la base de datos
     subtipos_actuales = SubtipoEnfermedad.query.all()
-    
     usuario_paciente = Usuario.query.get(paciente.id_usuario)
     
     gps_ocupados = [a.id_gps for a in AsignacionGPS.query.filter(AsignacionGPS.fecha_retiro.is_(None)).all() if a.id_gps != current_gps]
@@ -181,6 +184,7 @@ def perfil_paciente(id):
                            paciente=paciente, estado=estado_actual, enfermedad=enfermedad_nombre, subtipo=subtipo_desc, 
                            doctores=doctores, familiares=familiares, beacons=lista_beacons, gps=lista_gps, nfc=lista_nfc, 
                            controles=lista_controles, tratamientos=lista_tratamientos, doctores_disponibles=doctores_disponibles, 
+                           doctores_para_asignar=doctores_para_asignar, # AQUI PASAMOS LOS DOCTORES LIBRES
                            enfermedades_disponibles=enfermedades_disponibles, subtipos_actuales=subtipos_actuales, 
                            paciente_enf=paciente_enf, familiar_actual=familiar_actual, relacion_actual=relacion_actual, 
                            usuario_paciente=usuario_paciente, gps_lista=gps_lista, bea_lista=bea_lista, nfc_lista=nfc_lista, 
@@ -228,7 +232,6 @@ def editar_paciente(id):
         elif nuevo_id_enf:
             db.session.add(PacienteEnfermedad(id_paciente=id, id_enfermedad=nuevo_id_enf, id_subtipo=nuevo_id_sub, fecha_diagnostico=date.today()))
 
-        # LA CORRECCIÓN: Ordenamos explícitamente para actualizar a Maria y no a Jose.
         rel_fam = PacienteFamiliar.query.filter_by(id_paciente=id).order_by(PacienteFamiliar.id_familiar.asc()).first()
         email_fam_val = request.form.get('email_fam', '').strip()
         fam_email = email_fam_val if email_fam_val else None
@@ -297,3 +300,42 @@ def eliminar_paciente(id):
         db.session.rollback()
         flash(f'Error al eliminar el paciente: {str(e)}', 'error')
     return redirect(url_for('admin.pacientes'))
+
+# --- NUEVAS RUTAS DE DOCTORES ---
+@admin_bp.route('/paciente/<int:id>/asignar_doctor', methods=['POST'])
+def asignar_doctor(id):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    paciente = Paciente.query.get_or_404(id)
+    doc_id = request.form.get('id_doctor')
+    
+    try:
+        if doc_id:
+            doctor = Doctor.query.get(doc_id)
+            if doctor and doctor not in paciente.doctores:
+                paciente.doctores.append(doctor)
+                db.session.commit()
+                flash(f'El Dr. {doctor.nombre} {doctor.apellido} fue asignado exitosamente.', 'success')
+            else:
+                flash('El doctor ya esta asignado o no existe.', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al asignar doctor: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.perfil_paciente', id=id))
+
+@admin_bp.route('/paciente/<int:id_paciente>/quitar_doctor/<int:id_doctor>', methods=['POST'])
+def quitar_doctor(id_paciente, id_doctor):
+    if session.get('rol') != 'admin': return redirect(url_for('auth.login'))
+    paciente = Paciente.query.get_or_404(id_paciente)
+    doctor = Doctor.query.get_or_404(id_doctor)
+    
+    try:
+        if doctor in paciente.doctores:
+            paciente.doctores.remove(doctor)
+            db.session.commit()
+            flash(f'El Dr. {doctor.nombre} {doctor.apellido} ha sido removido del expediente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al quitar doctor: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.perfil_paciente', id=id_paciente))

@@ -102,7 +102,7 @@
 <div class="card-lista">
     <div class="card-lista-header">
         <h3 class="seccion-titulo">DOCTORES</h3>
-        <a href="#" class="btn-text-primary">+ Asignar doctor</a>
+        <a href="#modalAsignarDoctor" class="btn-text-primary">+ Asignar doctor</a>
     </div>
     <table class="tabla-limpia">
         <thead>
@@ -121,13 +121,57 @@
                 <td>{{ doc.especialidad_rel.nombre if doc.especialidad_rel else 'General' }}</td>
                 <td>{{ doc.email }}</td>
                 <td>{{ doc.telefono }}</td>
-                <td><a href="#" class="text-danger">Quitar</a></td>
+                <td><a href="#modalQuitarDoc-{{ doc.id }}" class="text-danger">Quitar</a></td>
             </tr>
+            
+            <div id="modalQuitarDoc-{{ doc.id }}" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header-alerta">
+                        <i class="fas fa-exclamation-triangle" style="color: #b91c1c; font-size: 20px;"></i>
+                        <h3>Quitar doctor</h3>
+                    </div>
+                    <p>¿Estás seguro de que deseas quitar al <strong>Dr. {{ doc.nombre }} {{ doc.apellido }}</strong> de este paciente? Perderá el acceso inmediato al expediente y monitoreo.</p>
+                    <div class="modal-buttons">
+                        <form action="{{ url_for('admin.quitar_doctor', id_paciente=paciente.id, id_doctor=doc.id) }}" method="POST" style="margin:0; width:48%;">
+                            <button type="submit" class="btn-modal btn-confirmar-eliminar" style="border:none; width: 100%;">Sí, quitar</button>
+                        </form>
+                        <a href="#" class="btn-modal btn-cancelar">Cancelar</a>
+                    </div>
+                </div>
+            </div>
             {% else %}
             <tr><td colspan="5">No hay doctores asignados.</td></tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<div class="modal-overlay" id="modalAsignarDoctor">
+    <div class="modal-content" style="max-width: 500px; padding: 32px; position: relative; text-align: left;">
+        <a href="#" class="modal-close" style="position: absolute; right: 24px; top: 24px; color: var(--admin-text-gray); text-decoration: none; font-size: 20px;"><i class="fas fa-times"></i></a>
+        
+        <div class="modal-header" style="margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--admin-text-dark);">Asignar nuevo doctor</h2>
+            <p style="font-size: 14px; color: var(--admin-text-gray); margin-top: 4px;">Seleccione el especialista que tendrá acceso al expediente de este paciente.</p>
+        </div>
+
+        <form action="{{ url_for('admin.asignar_doctor', id=paciente.id) }}" method="POST">
+            <div class="form-group">
+                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--admin-text-gray); margin-bottom: 6px; text-transform: uppercase;">Doctores Disponibles</label>
+                <select name="id_doctor" class="form-control" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 14px; outline: none;" required>
+                    <option value="">-- Seleccione un doctor --</option>
+                    {% for doc in doctores_para_asignar %}
+                        <option value="{{ doc.id }}">Dr. {{ doc.nombre }} {{ doc.apellido }} ({{ doc.especialidad_rel.nombre if doc.especialidad_rel else 'General' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--admin-border);">
+                <a href="#" class="btn-secondary" style="background: transparent; color: var(--admin-text-gray); border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none;">Cancelar</a>
+                <button type="submit" class="btn-primary" style="background-color: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;">Asignar Doctor</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card-lista">
